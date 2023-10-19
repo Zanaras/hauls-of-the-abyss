@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\Race" table="race">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+
+		<!--
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_character"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_character"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_character"/>
+
+		<one-to-many field="conv_permissions" target-entity="ConversationPermission" mapped-by="character" fetch="EXTRA_LAZY"/>
+		<one-to-one field="local_conversation" target-entity="Conversation" mapped-by="local_for" fetch="EXTRA_LAZY"/>
+		<one-to-many field="messages" target-entity="Message" mapped-by="sender" fetch="EXTRA_LAZY"/>
+		<one-to-many field="tagged_messages" target-entity="MessageTag" mapped-by="character" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
+		<one-to-many field="created_styles" target-entity="Style" mapped-by="creator"/>
+		-->
+	</entity>
+</doctrine-mapping>

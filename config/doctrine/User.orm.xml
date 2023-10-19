@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\User" table="appuser">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="username" column="username" type="string" length="180" />
+		<field name="email" column="email" type="string" length="180" />
+		<field name="isVerified" column="is_verified" type="boolean" />
+		<field name="password" column="password" type="string" />
+		<field name="lastPasswordChange" type="datetime" nullable="true"/>
+		<field name="lastLogin" column="last_login" type="datetime" nullable="true" />
+		<field name="roles" column="roles" type="array" />
+		<field name="ip" type="string" nullable="true"/>
+		<field name="agent" type="text" nullable="true"/>
+		<field name="banned" type="boolean" nullable="true"/>
+		<field name="banReason" type="string" nullable="true"/>
+
+		<one-to-many field="logs" target-entity="UserLog" mapped-by="user"/>
+		<field name="watched" type="boolean" nullable="true"/>
+		<field name="bypassExitCheck" type="boolean" nullable="true"/>
+
+		<field name="language" type="string" nullable="true"/>
+		<field name="notifications" type="boolean" nullable="true"/>
+		<field name="notificationTarget" type="string" nullable="true"/>
+		<field name="newsletter" type="boolean" nullable="true"/>
+		<field name="public" type="boolean" nullable="true"/>
+
+		<one-to-many field="characters" target-entity="Character" mapped-by="user"/>
+
+		<unique-constraints>
+			<unique-constraint columns="username" />
+			<unique-constraint columns="email" />
+		</unique-constraints>
+	</entity>
+</doctrine-mapping>

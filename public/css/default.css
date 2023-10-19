@@ -1,0 +1,96 @@
+html{
+    background: url("../images/canvas.jpg") repeat scroll 0 0 #db9;
+    background-position: center top;
+}
+
+body {
+}
+
+/* Content Stuff */
+
+#content {
+        background: rgba(255,250,242,0.6);
+        box-shadow: 0 0 1em rgba(0, 0, 0, 0.75);
+        color: black;
+        border: 3px solid black;
+        margin: 180px 0 0 0;
+        width: 100%;
+        word-wrap: break-word;
+}
+
+/* Footer Stuff */
+
+#footer {
+        background: rgba(255,250,242,0.6);
+        box-shadow: 0 0 1em rgba(0, 0, 0, 0.75);
+        color: black;
+        margin-left: auto;
+        margin-right: auto;
+        width: 60%;
+        border: 3px solid black;
+        text-align: center;
+}
+
+/* Navigation Stuff */
+
+#nav {
+        font-size: 1.2em;
+        height: 2.2em;
+        background-color: black;
+        text-align: center;
+        border-top: 3px solid white;
+        border-bottom: 3px solid white;
+        position: absolute;
+        top: 130px;
+        left: 0;
+        width: 100%;
+}
+
+#nav li {
+        list-style: none;
+}
+
+#nav ul {
+        margin: 0;
+        padding: 0;
+}
+
+#nav>ul>li {
+        display: inline-block;
+        margin: 0 0;
+        padding: 0;
+
+}
+
+#nav>ul>li>a {
+        line-height: 2em;
+        display: block;
+        color: white;
+        text-decoration: none;
+}
+
+ul.navbar {
+    font-size: 18px;
+    margin: 0;
+    position: absolute;
+    top: 0.1em;
+    right: 4%;
+}
+
+ul.navbar li {
+    display: inline;
+    border: 1px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    padding: 1em 0.4em 0.1em 0.4em;
+    text-align: center;
+}
+
+ul.navbar li a {
+    color: white; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+}
+ul.navbar li a:hover {
+    color: white;
+}
+ul.navbar li a.new {
+/*    background: url("../images/star16.png") no-repeat scroll right; */
+    padding-right: 24px;
+}

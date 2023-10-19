@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {# TODO: Setup theme switcher here if we add more themes. #}
+        {% set theme = 'default' %}
+        <meta charset="UTF-8">
+        <title id="title">
+            {% block title %}{% endblock %}
+        </title>
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('/css/'~theme~'.css') }}"/>
+        {% endblock %}
+    </head>
+    <body>
+        <div id="nav">
+            {% include 'parts/nav.html.twig' %}
+        </div>
+        <div id="content">
+            {% block body %}{% endblock %}
+        </div>
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash-{{ label }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
