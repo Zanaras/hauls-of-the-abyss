@@ -14,20 +14,35 @@ use LogicException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-
+/**
+ * AppState is all the bare essential functions that are expected to be called just about anywhere.
+ */
 class AppState {
-	private EntityManagerInterface $em;
-	private Security $security;
 
 	const USER = 'u';
 	const CHAR = 'c';
+
+	private EntityManagerInterface $em;
+	private Security $security;
 
 	public function __construct(EntityManagerInterface $em, Security $security) {
 		$this->em = $em;
 		$this->security = $security;
 	}
 
-	public function security(string $return, string $route, array $slugs, bool $override = false, bool $flush = true): User|Character|GuideKeeper {
+	/**
+	 * The security function does all the basic access checks for an authenticated user on routes we either want to log or need to perform second and third level checks on.
+	 * Checks all users if they are banned and, if exit checking applies, if they're using a trackable IP or not (so we can prevent multis).
+	 *
+	 * @param string $return
+	 * @param string $route
+	 * @param array  $slugs
+	 * @param bool   $override
+	 * @param bool   $flush
+	 *
+	 * @return User|Character|GuideKeeper|null
+	 */
+	public function security(string $return, string $route, array $slugs, bool $override = false, bool $flush = true): User|Character|GuideKeeper|null {
 		$user = $this->security->getUser();
 		/** @var User $user */
 		if ($this->security->isGranted('IS_AUTHENTICATED')) {
@@ -54,9 +69,18 @@ class AppState {
 				}
 			}
 		}
-		throw new LogicException("Symfony Firewall Failure -- Route requires User but not authenticated.", 401);
+		return null;
 	}
 
+	/**
+	 * Generates a token that is, theoretically, somewhat cryptographically secure.
+	 *
+	 * @param $length
+	 * @param $method
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
 	public function generateToken($length = 128, $method = 'trimbase64'): string {
 		$token = match ($method) {
 			default => rtrim(strtr(base64_encode(random_bytes($length)), '+/', '-_'), '='),
@@ -64,6 +88,17 @@ class AppState {
 		return $token;
 	}
 
+	/**
+	 * Generates and checks uniqueness of a token against a particular object and object property.
+	 * If you only need a token, just call generateToken instead.
+	 *
+	 * @param $length
+	 * @param $check
+	 * @param $against
+	 *
+	 * @return bool|string
+	 * @throws Exception
+	 */
 	public function generateAndCheckToken($length, $check = 'User', $against = 'reset_token'): bool|string {
 		$valid = false;
 		$token = false;
@@ -101,9 +136,10 @@ class AppState {
 	/**
 	 * Logs a given user if they have $user->getWatched set to true or if $alwaysLog is set to true.
 	 *
-	 * @param        $user
+	 * @param User   $user
 	 * @param string $route
-	 * @param false  $alwaysLog
+	 * @param array  $slugs
+	 * @param bool   $flush
 	 *
 	 * @return void
 	 */
