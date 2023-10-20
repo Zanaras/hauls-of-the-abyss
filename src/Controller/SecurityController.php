@@ -68,7 +68,14 @@ class SecurityController extends AbstractController {
 
 			// generate a signed url and email it to the user
 			#TODO: Run this through the tranlsator system.
-			$this->emailVerifier->sendEmailConfirmation('app_verify_email', $user, (new TemplatedEmail())->from(new Address('hota-server@lemuriacommunity.org', 'Hauls of the Abyss Game'))->to($user->getEmail())->subject('Please Confirm your Email')->htmlTemplate('registration/confirmation_email.html.twig'));
+			$this->emailVerifier->sendEmailConfirmation(
+				'app_verify_email',
+				$user, (new TemplatedEmail())
+					->from(new Address($_ENV['FROM_EMAIL'], $_ENV['FROM_NAME']))
+					->to($user->getEmail())
+					->subject('Please Confirm your Email')
+					->htmlTemplate('registration/confirmation_email.html.twig')
+			);
 			// do anything else you need here, like send an email
 
 			$this->addFlash('notice', $this->trans->trans('user.register.emailSent', [], 'security'));
