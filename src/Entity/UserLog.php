@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
+use DateTimeInterface;
 
 class UserLog {
-	private ?\DateTimeInterface $ts = null;
+	private ?DateTimeInterface $ts = null;
 	private ?string $ip = null;
 	private ?string $route = null;
 	private ?string $agent = null;
@@ -14,11 +14,11 @@ class UserLog {
 	private ?string $slugs = null;
 	private ?Character $character = null;
 
-	public function getTs(): ?\DateTimeInterface {
+	public function getTs(): ?DateTimeInterface {
    		return $this->ts;
    	}
 
-	public function setTs(\DateTimeInterface $ts): static {
+	public function setTs(DateTimeInterface $ts): static {
    		$this->ts = $ts;
    
    		return $this;

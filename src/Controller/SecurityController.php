@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\GuideKeeper;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use App\Service\AppState;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
@@ -41,7 +44,7 @@ class SecurityController extends AbstractController {
 		// last username entered by the user
 		$lastUsername = $authenticationUtils->getLastUsername();
 
-		return $this->render('login/login.html.twig', ['last_username' => $lastUsername, 'error' => $error,]);
+		return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error,]);
 	}
 
 	#[Route(path: '/logout', name: 'user_logout')]
@@ -72,7 +75,7 @@ class SecurityController extends AbstractController {
 			return $this->redirectToRoute('index');
 		}
 
-		return $this->render('registration/register.html.twig', ['registrationForm' => $form->createView(),]);
+		return $this->render('security/register.html.twig', ['registrationForm' => $form->createView(),]);
 	}
 
 	#[Route('/verify/email', name: 'user_verify_email')]
@@ -107,8 +110,12 @@ class SecurityController extends AbstractController {
 
 	#[Route(path: '/characters', name: 'user_characters')]
 	public function characters(AuthenticationUtils $authenticationUtils): Response {
-		$user = $this->app->security('u', 'user_characters', []);
+		$user = $this->app->security(AppState::USER, 'user_characters', []);
+		if ($user instanceof GuideKeeper) {
+			$this->addFlash('error', $this->trans->trans($user->getReason(), [], 'gatekeeper'));
+			return new RedirectResponse($user->getRoute());
+		}
 
-		return $this->render('login/login.html.twig', ['characters' => $user->getCharacters(),]);
+		return $this->render('security/characters.html.twig', ['characters' => $user->getCharacters(),]);
 	}
 }

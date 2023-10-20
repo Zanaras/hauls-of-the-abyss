@@ -284,7 +284,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
 		return $this->isVerified;
 	}
 
-	public function isBanned(): ?bool {
+	public function getBanned(): ?bool {
 		return $this->banned;
 	}
 

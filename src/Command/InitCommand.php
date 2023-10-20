@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Entity\AppSetting;
 use App\Entity\Race;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

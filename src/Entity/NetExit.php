@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use DateTimeInterface;
-use Doctrine\DBAL\Types\Types;
-
 class NetExit {
 	private ?DateTimeInterface $ts = null;
 	private ?DateTimeInterface $last_seen = null;

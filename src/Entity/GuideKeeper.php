@@ -11,11 +11,11 @@ class GuideKeeper {
 		$this->reason = $reason;
 	}
 
-	public function getRoute() {
+	public function getRoute(): string {
 		return $this->route;
 	}
 
-	public function getReason() {
+	public function getReason(): string {
 		return $this->reason;
 	}
 }
