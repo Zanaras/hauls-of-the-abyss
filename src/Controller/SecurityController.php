@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
+use App\Service\AppState;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,38 +20,33 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 /**
- * Security Controller is for anything that creates, modifies, or removes user accounts or user security controls, or lets someone login or logout.
+ * User Controller is for anything that creates, modifies, or removes user accounts or user security controls, lets someone login or logout, or lets someone access something that only makes sense if you're logged in but not playing.
  */
 class SecurityController extends AbstractController {
-
 	private EmailVerifier $emailVerifier;
 	private TranslatorInterface $trans;
+	private AppState $app;
 
-	public function __construct(EmailVerifier $emailVerifier, TranslatorInterface $trans)
-	{
+	public function __construct(AppState $app, EmailVerifier $emailVerifier, TranslatorInterface $trans) {
+		$this->app = $app;
 		$this->emailVerifier = $emailVerifier;
 		$this->trans = $trans;
 	}
 
 	#[Route(path: '/login', name: 'user_login')]
-	public function login(AuthenticationUtils $authenticationUtils): Response
-	{
+	public function login(AuthenticationUtils $authenticationUtils): Response {
 		// get the login error if there is one
 		$error = $authenticationUtils->getLastAuthenticationError();
 
 		// last username entered by the user
 		$lastUsername = $authenticationUtils->getLastUsername();
 
-		return $this->render('login/login.html.twig', [
-			'last_username' => $lastUsername,
-			'error' => $error,
-		]);
+		return $this->render('login/login.html.twig', ['last_username' => $lastUsername, 'error' => $error,]);
 	}
 
 	#[Route(path: '/logout', name: 'user_logout')]
-	public function logout(): void
-	{
-		throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+	public function logout(): void {
+		throw new LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
 	}
 
 	#[Route('/register', name: 'user_register')]
@@ -60,34 +57,22 @@ class SecurityController extends AbstractController {
 
 		if ($form->isSubmitted() && $form->isValid()) {
 			// encode the plain password
-			$user->setPassword(
-				$userPasswordHasher->hashPassword(
-					$user,
-					$form->get('plainPassword')->getData()
-				)
-			);
+			$user->setPassword($userPasswordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
 
 			$entityManager->persist($user);
+			$user->setCreated(new DateTime('now'));
 			$entityManager->flush();
 
 			// generate a signed url and email it to the user
 			#TODO: Run this through the tranlsator system.
-			$this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-				(new TemplatedEmail())
-					->from(new Address('hota-server@lemuriacommunity.org', 'Hauls of the Abyss Game'))
-					->to($user->getEmail())
-					->subject('Please Confirm your Email')
-					->htmlTemplate('registration/confirmation_email.html.twig')
-			);
+			$this->emailVerifier->sendEmailConfirmation('app_verify_email', $user, (new TemplatedEmail())->from(new Address('hota-server@lemuriacommunity.org', 'Hauls of the Abyss Game'))->to($user->getEmail())->subject('Please Confirm your Email')->htmlTemplate('registration/confirmation_email.html.twig'));
 			// do anything else you need here, like send an email
 
 			$this->addFlash('notice', $this->trans->trans('user.register.emailSent', [], 'security'));
 			return $this->redirectToRoute('index');
 		}
 
-		return $this->render('registration/register.html.twig', [
-			'registrationForm' => $form->createView(),
-		]);
+		return $this->render('registration/register.html.twig', ['registrationForm' => $form->createView(),]);
 	}
 
 	#[Route('/verify/email', name: 'user_verify_email')]
@@ -96,7 +81,7 @@ class SecurityController extends AbstractController {
 
 		if (null === $id) {
 			$this->addFlash('notice', $this->trans->trans('user.verify.validation', [], 'gatekeeper'));
-			return $this->redirectToRoute('app_register');
+			return $this->redirectToRoute('user_register');
 		}
 
 		$repository = $manager->getRepository(User::class);
@@ -104,7 +89,7 @@ class SecurityController extends AbstractController {
 
 		if (null === $user) {
 			$this->addFlash('notice', $this->trans->trans('user.verify.validation', [], 'gatekeeper'));
-			return $this->redirectToRoute('app_register');
+			return $this->redirectToRoute('user_register');
 		}
 
 		// validate email confirmation link, sets User::isVerified=true and persists
@@ -113,10 +98,17 @@ class SecurityController extends AbstractController {
 		} catch (VerifyEmailExceptionInterface $exception) {
 			$this->addFlash('error', $this->trans->trans('user.verify.validation', [], 'gatekeeper'));
 			#$this->addFlash('verify_email_error', $exception->getReason()); #Default Symfony code.
-			return $this->redirectToRoute('app_register');
+			return $this->redirectToRoute('user_register');
 		}
 
 		$this->addFlash('success', $this->trans->trans('user.verify.success', [], 'security'));
-		return $this->redirectToRoute('account_characters');
+		return $this->redirectToRoute('user_characters');
+	}
+
+	#[Route(path: '/characters', name: 'user_characters')]
+	public function characters(AuthenticationUtils $authenticationUtils): Response {
+		$user = $this->app->security('u', 'user_characters', []);
+
+		return $this->render('login/login.html.twig', ['characters' => $user->getCharacters(),]);
 	}
 }

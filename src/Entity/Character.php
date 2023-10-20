@@ -2,221 +2,179 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 
-class Character
-{
-    private ?string $name = null;
+class Character {
+	private ?string $name = null;
+	private ?bool $alive = null;
+	private ?bool $retired = null;
+	private ?DateTimeInterface $retired_on = null;
+	private ?int $magic = null;
+	private ?DateTimeInterface $created = null;
+	private ?DateTimeInterface $last_access = null;
+	private ?bool $slumbering = null;
+	private ?bool $special = null;
+	private ?int $wounded = null;
+	private ?int $id = null;
+	private Collection $userLogs;
+	private ?User $user = null;
+	private ?Race $race = null;
 
-    private ?bool $alive = null;
+	public function __construct() {
+   		$this->userLogs = new ArrayCollection();
+   	}
 
-    private ?bool $retired = null;
+	public function getName(): ?string {
+   		return $this->name;
+   	}
 
-    private ?\DateTimeInterface $retired_on = null;
+	public function setName(string $name): static {
+   		$this->name = $name;
+   
+   		return $this;
+   	}
 
-    private ?int $magic = null;
+	public function isAlive(): ?bool {
+   		return $this->alive;
+   	}
 
-    private ?\DateTimeInterface $created = null;
+	public function setAlive(bool $alive): static {
+   		$this->alive = $alive;
+   
+   		return $this;
+   	}
 
-    private ?\DateTimeInterface $last_access = null;
+	public function isRetired(): ?bool {
+   		return $this->retired;
+   	}
 
-    private ?bool $slumbering = null;
+	public function setRetired(?bool $retired): static {
+   		$this->retired = $retired;
+   
+   		return $this;
+   	}
 
-    private ?bool $special = null;
+	public function getRetiredOn(): ?DateTimeInterface {
+   		return $this->retired_on;
+   	}
 
-    private ?int $wounded = null;
+	public function setRetiredOn(?DateTimeInterface $retired_on): static {
+   		$this->retired_on = $retired_on;
+   
+   		return $this;
+   	}
 
-    private ?int $id = null;
+	public function getMagic(): ?int {
+   		return $this->magic;
+   	}
 
-    private Collection $userLogs;
+	public function setMagic(?int $magic): static {
+   		$this->magic = $magic;
+   
+   		return $this;
+   	}
 
-    private ?User $user = null;
+	public function getCreated(): ?DateTimeInterface {
+   		return $this->created;
+   	}
 
-    private ?Race $race = null;
+	public function setCreated(DateTimeInterface $created): static {
+   		$this->created = $created;
+   
+   		return $this;
+   	}
 
-    public function __construct()
-    {
-        $this->userLogs = new ArrayCollection();
-    }
+	public function getLastAccess(): ?DateTimeInterface {
+   		return $this->last_access;
+   	}
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
+	public function setLastAccess(DateTimeInterface $last_access): static {
+   		$this->last_access = $last_access;
+   
+   		return $this;
+   	}
 
-    public function setName(string $name): static
-    {
-        $this->name = $name;
+	public function isSlumbering(): ?bool {
+   		return $this->slumbering;
+   	}
 
-        return $this;
-    }
+	public function setSlumbering(bool $slumbering): static {
+   		$this->slumbering = $slumbering;
+   
+   		return $this;
+   	}
 
-    public function isAlive(): ?bool
-    {
-        return $this->alive;
-    }
+	public function isSpecial(): ?bool {
+   		return $this->special;
+   	}
 
-    public function setAlive(bool $alive): static
-    {
-        $this->alive = $alive;
+	public function setSpecial(bool $special): static {
+   		$this->special = $special;
+   
+   		return $this;
+   	}
 
-        return $this;
-    }
+	public function getWounded(): ?int {
+   		return $this->wounded;
+   	}
 
-    public function isRetired(): ?bool
-    {
-        return $this->retired;
-    }
+	public function setWounded(int $wounded): static {
+   		$this->wounded = $wounded;
+   
+   		return $this;
+   	}
 
-    public function setRetired(?bool $retired): static
-    {
-        $this->retired = $retired;
+	public function getId(): ?int {
+   		return $this->id;
+   	}
 
-        return $this;
-    }
+	/**
+	 * @return Collection<int, UserLog>
+	 */
+	public function getUserLogs(): Collection {
+   		return $this->userLogs;
+   	}
 
-    public function getRetiredOn(): ?\DateTimeInterface
-    {
-        return $this->retired_on;
-    }
+	public function addUserLog(UserLog $userLog): static {
+   		if (!$this->userLogs->contains($userLog)) {
+   			$this->userLogs->add($userLog);
+   			$userLog->setCharacter($this);
+   		}
+   
+   		return $this;
+   	}
 
-    public function setRetiredOn(?\DateTimeInterface $retired_on): static
-    {
-        $this->retired_on = $retired_on;
+	public function removeUserLog(UserLog $userLog): static {
+   		if ($this->userLogs->removeElement($userLog)) {
+   			// set the owning side to null (unless already changed)
+   			if ($userLog->getCharacter() === $this) {
+   				$userLog->setCharacter(null);
+   			}
+   		}
+   
+   		return $this;
+   	}
 
-        return $this;
-    }
+	public function getUser(): ?User {
+   		return $this->user;
+   	}
 
-    public function getMagic(): ?int
-    {
-        return $this->magic;
-    }
+	public function setUser(?User $user): static {
+   		$this->user = $user;
+   
+   		return $this;
+   	}
 
-    public function setMagic(?int $magic): static
-    {
-        $this->magic = $magic;
+	public function getRace(): ?Race {
+   		return $this->race;
+   	}
 
-        return $this;
-    }
-
-    public function getCreated(): ?\DateTimeInterface
-    {
-        return $this->created;
-    }
-
-    public function setCreated(\DateTimeInterface $created): static
-    {
-        $this->created = $created;
-
-        return $this;
-    }
-
-    public function getLastAccess(): ?\DateTimeInterface
-    {
-        return $this->last_access;
-    }
-
-    public function setLastAccess(\DateTimeInterface $last_access): static
-    {
-        $this->last_access = $last_access;
-
-        return $this;
-    }
-
-    public function isSlumbering(): ?bool
-    {
-        return $this->slumbering;
-    }
-
-    public function setSlumbering(bool $slumbering): static
-    {
-        $this->slumbering = $slumbering;
-
-        return $this;
-    }
-
-    public function isSpecial(): ?bool
-    {
-        return $this->special;
-    }
-
-    public function setSpecial(bool $special): static
-    {
-        $this->special = $special;
-
-        return $this;
-    }
-
-    public function getWounded(): ?int
-    {
-        return $this->wounded;
-    }
-
-    public function setWounded(int $wounded): static
-    {
-        $this->wounded = $wounded;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return Collection<int, UserLog>
-     */
-    public function getUserLogs(): Collection
-    {
-        return $this->userLogs;
-    }
-
-    public function addUserLog(UserLog $userLog): static
-    {
-        if (!$this->userLogs->contains($userLog)) {
-            $this->userLogs->add($userLog);
-            $userLog->setCharacter($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserLog(UserLog $userLog): static
-    {
-        if ($this->userLogs->removeElement($userLog)) {
-            // set the owning side to null (unless already changed)
-            if ($userLog->getCharacter() === $this) {
-                $userLog->setCharacter(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    public function getRace(): ?Race
-    {
-        return $this->race;
-    }
-
-    public function setRace(?Race $race): static
-    {
-        $this->race = $race;
-
-        return $this;
-    }
+	public function setRace(?Race $race): static {
+   		$this->race = $race;
+   
+   		return $this;
+   	}
 }

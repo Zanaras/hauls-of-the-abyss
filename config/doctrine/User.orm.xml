@@ -8,6 +8,7 @@
 		<field name="email" column="email" type="string" length="180" />
 		<field name="isVerified" column="is_verified" type="boolean" />
 		<field name="password" column="password" type="string" />
+		<field name="created" type="datetime" nullable="true"/>
 		<field name="lastPasswordChange" type="datetime" nullable="true"/>
 		<field name="lastLogin" column="last_login" type="datetime" nullable="true" />
 		<field name="roles" column="roles" type="array" />

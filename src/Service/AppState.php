@@ -13,12 +13,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 
 class AppState {
-
 	private EntityManagerInterface $em;
 	private RequestStack $requestStack;
 	private Security $security;
@@ -29,7 +26,7 @@ class AppState {
 		$this->security = $security;
 	}
 
-	public function security(string $return, string $route, array $slugs, bool $override, bool $flush = true) {
+	public function security(string $return, string $route, array $slugs, bool $override = false, bool $flush = true) {
 		$user = $this->security->getUser();
 		if ($this->security->isGranted('IS_AUTHENTICATED')) {
 			if ($route !== 'ip_needed') {
@@ -55,7 +52,7 @@ class AppState {
 		}
 	}
 
-	private function getCharacter($required=true, $ok_if_dead=false, $ok_if_notstarted=false): mixed {
+	private function getCharacter($required = true, $ok_if_dead = false, $ok_if_notstarted = false): mixed {
 		/* This used to throw exceptions rather than adding flashes and returning strings.
 		The change was done in order to ensure that when you're somewhere you shouldn't be,
 		that the game is smart enough to redirect you to the right spot.
@@ -146,21 +143,21 @@ class AppState {
 		return $token;
 	}
 
-        public function generateAndCheckToken($length, $check = 'User', $against = 'reset_token'): bool|string {
-                $valid = false;
-                $token = false;
-                $em = $this->em;
-                if ($check == 'User') {
-                        while (!$valid) {
-                                $token = $this->generateToken($length, 'bin2hex');
-                                $result = $em->getRepository(User::class)->findOneBy([$against => $token]);
-                                if (!$result) {
-                                        $valid = true;
-                                }
-                        }
-                }
-                return $token;
-        }
+	public function generateAndCheckToken($length, $check = 'User', $against = 'reset_token'): bool|string {
+		$valid = false;
+		$token = false;
+		$em = $this->em;
+		if ($check == 'User') {
+			while (!$valid) {
+				$token = $this->generateToken($length, 'bin2hex');
+				$result = $em->getRepository(User::class)->findOneBy([$against => $token]);
+				if (!$result) {
+					$valid = true;
+				}
+			}
+		}
+		return $token;
+	}
 
 	public function logSecurityViolation($ip, $route, $user, $type): void {
 		$em = $this->em;
@@ -177,16 +174,17 @@ class AppState {
 
 	/**
 	 * Returns a user's IP, usually as a string.
+	 *
 	 * @return mixed
 	 */
 	public function findIp(): mixed {
-		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 			//ip from share internet
 			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 			//ip pass from proxy
 			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}else{
+		} else {
 			$ip = $_SERVER['REMOTE_ADDR'];
 		}
 		return $ip;
@@ -194,9 +192,11 @@ class AppState {
 
 	/**
 	 * Logs a given user if they have $user->getWatched set to true or if $alwaysLog is set to true.
-	 * @param $user
+	 *
+	 * @param        $user
 	 * @param string $route
-	 * @param false $alwaysLog
+	 * @param false  $alwaysLog
+	 *
 	 * @return void
 	 */
 	public function logUser(User $user, string $route, array $slugs = [], bool $flush = false): void {
@@ -216,8 +216,8 @@ class AppState {
 		$entry->setAgent($agent);
 		$entry->setRoute($route);
 		$txt = '';
-		foreach ($slugs as $slug=>$var) {
-			$txt .= $slug.': '.$var.'; ';
+		foreach ($slugs as $slug => $var) {
+			$txt .= $slug . ': ' . $var . '; ';
 		}
 		$entry->setSlugs($txt);
 		if ($flush) {
@@ -228,7 +228,9 @@ class AppState {
 	/**
 	 * Checks whether a given user is accessing from an IP recorded on the NetExits table.
 	 * Returns false if they have $user->getBypassExits() as true or if the IP isn't found in the NetExits table.
+	 *
 	 * @param $user
+	 *
 	 * @return bool
 	 */
 	public function exitsCheck($user): bool {
@@ -237,13 +239,11 @@ class AppState {
 			return false;
 		}
 		$ip = $this->findIp();
-		if ($this->em->getRepository(NetExit::class)->findOneBy(['ip'=>$ip])) {
+		if ($this->em->getRepository(NetExit::class)->findOneBy(['ip' => $ip])) {
 			# Hit found, check failed.
 			return true;
 		}
 		# Nothing found, check passed.
 		return false;
 	}
-
-
 }
