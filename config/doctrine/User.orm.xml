@@ -18,6 +18,7 @@
 		<field name="banReason" type="string" nullable="true"/>
 
 		<one-to-many field="logs" target-entity="UserLog" mapped-by="user"/>
+		<one-to-many field="securityLogs" target-entity="SecurityLog" mapped-by="user"/>
 		<field name="watched" type="boolean" nullable="true"/>
 		<field name="bypassExitCheck" type="boolean" nullable="true"/>
 
@@ -28,6 +29,10 @@
 		<field name="public" type="boolean" nullable="true"/>
 
 		<one-to-many field="characters" target-entity="Character" mapped-by="user"/>
+		<one-to-one field="currentCharacter" target-entity="Character"/>
+		<one-to-many field="unlockedOrigins" target-entity="UserOrigin" mapped-by="user"/>
+		<one-to-many field="descriptions" target-entity="Description" mapped-by="user"/>
+		<one-to-one field="description" target-entity="Description" mapped-by="active_user"/>
 
 		<unique-constraints>
 			<unique-constraint columns="username" />

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\Origin">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="public" type="boolean"/>
+		<field name="shortDescription" type="text"/>
+		<field name="longDescription" type="text"/>
+		<one-to-many field="skills" target-entity="OriginSkill" mapped-by="origin"/>
+
+	</entity>
+</doctrine-mapping>

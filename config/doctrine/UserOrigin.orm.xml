@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\UserOrigin">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="dateUnlocked" type="datetime"/>
+		<many-to-one field="user" target-entity="User" inversed-by="unlockedOrigins"/>
+		<many-to-one field="origin" target-entity="Origin"/>
+
+	</entity>
+</doctrine-mapping>

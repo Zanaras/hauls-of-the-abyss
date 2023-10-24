@@ -1,0 +1,13 @@
+<doctrine-mapping>
+    <entity name="App\Entity\SkillType">
+        <id name="id" type="integer">
+            <generator strategy="AUTO" />
+        </id>
+
+        <field name="name" type="string" />
+
+        <!-- one-to-many field="used_by" target-entity="EquipmentType" mapped-by="skill"/> -->
+        <many-to-one field="category" target-entity="SkillCategory" inversed-by="skills"/>
+        <one-to-many field="origins" target-entity="OriginSkill" mapped-by="skill"/>
+    </entity>
+</doctrine-mapping>

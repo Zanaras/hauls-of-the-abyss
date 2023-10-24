@@ -10,10 +10,9 @@ class Character {
 	private ?string $name = null;
 	private ?bool $alive = null;
 	private ?bool $retired = null;
-	private ?DateTimeInterface $retired_on = null;
-	private ?int $magic = null;
+	private ?DateTimeInterface $retiredOn = null;
 	private ?DateTimeInterface $created = null;
-	private ?DateTimeInterface $last_access = null;
+	private ?DateTimeInterface $lastAccess = null;
 	private ?bool $slumbering = null;
 	private ?bool $special = null;
 	private ?int $wounded = null;
@@ -21,9 +20,29 @@ class Character {
 	private Collection $userLogs;
 	private ?User $user = null;
 	private ?Race $race = null;
+	private ?int $areaCode = null;
+	private ?string $gender = null;
+	private Collection $descriptions;
+	private ?Description $description = null;
+	private Collection $updatedDescriptions;
+
+	public function isActive($slumbererIsActive = true): bool {
+   		if (!$this->alive) {
+   			return false;
+   		}
+   		if ($this->retired) {
+   			return false;
+   		}
+   		if (!$slumbererIsActive && $this->slumbering) {
+   			return false;
+   		}
+   		return true;
+   	}
 
 	public function __construct() {
    		$this->userLogs = new ArrayCollection();
+   		$this->descriptions = new ArrayCollection();
+   		$this->updatedDescriptions = new ArrayCollection();
    	}
 
 	public function getName(): ?string {
@@ -62,16 +81,6 @@ class Character {
 
 	public function setRetiredOn(?DateTimeInterface $retired_on): static {
    		$this->retired_on = $retired_on;
-   
-   		return $this;
-   	}
-
-	public function getMagic(): ?int {
-   		return $this->magic;
-   	}
-
-	public function setMagic(?int $magic): static {
-   		$this->magic = $magic;
    
    		return $this;
    	}
@@ -173,6 +182,100 @@ class Character {
 
 	public function setRace(?Race $race): static {
    		$this->race = $race;
+   
+   		return $this;
+   	}
+
+	public function getAreaCode(): ?int {
+   		return $this->areaCode;
+   	}
+
+	public function setAreaCode(int $areaCode): static {
+   		$this->areaCode = $areaCode;
+   
+   		return $this;
+   	}
+
+	public function getGender(): ?string {
+   		return $this->gender;
+   	}
+
+	public function setGender(string $gender): static {
+   		$this->gender = $gender;
+   
+   		return $this;
+   	}
+
+	public function getDescription(): ?Description {
+   		return $this->description;
+   	}
+
+	public function setDescription(?Description $description): static {
+   		// unset the owning side of the relation if necessary
+   		if ($description === null && $this->description !== null) {
+   			$this->description->setActiveCharacter(null);
+   		}
+
+   		// set the owning side of the relation if necessary
+   		if ($description !== null && $description->getActiveUser() !== $this) {
+   			$description->setActiveCharacter($this);
+   		}
+
+   		$this->description = $description;
+   
+   		return $this;
+   	}
+
+	/**
+	 * @return Collection<int, Description>
+	 */
+	public function getDescriptions(): Collection {
+   		return $this->descriptions;
+   	}
+
+	public function addDescription(Description $description): static {
+   		if (!$this->descriptions->contains($description)) {
+   			$this->descriptions->add($description);
+   			$description->setCharacter($this);
+   		}
+   
+   		return $this;
+   	}
+
+	public function removeDescription(Description $description): static {
+   		if ($this->descriptions->removeElement($description)) {
+   			// set the owning side to null (unless already changed)
+   			if ($description->getCharacter() === $this) {
+   				$description->setCharacter(null);
+   			}
+   		}
+   
+   		return $this;
+   	}
+
+	/**
+	 * @return Collection<int, Description>
+	 */
+	public function getUpdatedDescriptions(): Collection {
+   		return $this->updatedDescriptions;
+   	}
+
+	public function addUpdatedDescription(Description $updatedDescription): static {
+   		if (!$this->updatedDescriptions->contains($updatedDescription)) {
+   			$this->updatedDescriptions->add($updatedDescription);
+   			$updatedDescription->setUpdater($this);
+   		}
+   
+   		return $this;
+   	}
+
+	public function removeUpdatedDescription(Description $updatedDescription): static {
+   		if ($this->updatedDescriptions->removeElement($updatedDescription)) {
+   			// set the owning side to null (unless already changed)
+   			if ($updatedDescription->getUpdater() === $this) {
+   				$updatedDescription->setUpdater(null);
+   			}
+   		}
    
    		return $this;
    	}

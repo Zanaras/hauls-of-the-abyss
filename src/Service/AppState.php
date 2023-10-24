@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Character;
 use App\Entity\GuideKeeper;
 use App\Entity\NetExit;
+use App\Entity\SecurityLog;
 use App\Entity\User;
 use App\Entity\UserLog;
 use DateTime;
@@ -19,8 +20,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class AppState {
 
+	# Constants for security return flags.
 	const USER = 'u';
 	const CHAR = 'c';
+
+	# Constants for Character AreaCodes.
+	const MU = 0;
+	const TOWN = 1;
+	const DUNGEON = 2;
+	const WILDS = 3;
 
 	private EntityManagerInterface $em;
 	private Security $security;
@@ -42,7 +50,7 @@ class AppState {
 	 *
 	 * @return User|Character|GuideKeeper|null
 	 */
-	public function security(string $return, string $route, array $slugs, bool $override = false, bool $flush = true): User|Character|GuideKeeper|null {
+	public function security(string $return, string $route, array $slugs = [], bool $override = false, bool $flush = true): User|Character|GuideKeeper|null {
 		$user = $this->security->getUser();
 		/** @var User $user */
 		if ($this->security->isGranted('IS_AUTHENTICATED')) {
@@ -70,6 +78,18 @@ class AppState {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns a standardized and sanitized class name for an entity.
+	 * @param $entity
+	 *
+	 * @return false|int|string
+	 */
+	public function getClassName($entity): false|int|string {
+		$classname = get_class($entity);
+		if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
+		return $pos;
 	}
 
 	/**
@@ -143,7 +163,7 @@ class AppState {
 	 *
 	 * @return void
 	 */
-	public function logUser(User $user, string $route, array $slugs = [], bool $flush = false): void {
+	public function logUser(User $user, string $route, array $slugs = [], bool $flush = false, string $type = 'ul'): void {
 		$ip = $this->findIp();
 		$agent = $_SERVER['HTTP_USER_AGENT'];
 		if ($user->getIp() != $ip) {
@@ -152,7 +172,11 @@ class AppState {
 		if ($user->getAgent() != $agent) {
 			$user->setAgent($agent);
 		}
-		$entry = new UserLog;
+		if ($type !== 'ul') {
+			$entry = new SecurityLog;
+		} else {
+			$entry = new UserLog;
+		}
 		$this->em->persist($entry);
 		$entry->setTs(new DateTime('now'));
 		$entry->setUser($user);
@@ -189,5 +213,9 @@ class AppState {
 		}
 		# Nothing found, check passed.
 		return false;
+	}
+
+	public function findAvailableOrigins(Character $user) {
+
 	}
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\OriginSkill">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="skill" target-entity="SkillType" invesred-by="origins"/>
+		<many-to-one field="origin" target-entity="Origin" inversed-by="skills"/>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+    <entity name="App\Entity\Description">
+        <id name="id" type="integer">
+            <generator strategy="IDENTITY"/>
+        </id>
+
+        <many-to-one field="character" target-entity="Character" inversed-by="descriptions"/>
+        <one-to-one field="active_character" target-entity="Character" inversed-by="description"/>
+
+        <many-to-one field="user" target-entity="User" inversed-by="descriptions"/>
+        <one-to-one field="active_user" target-entity="User" inversed-by="description"/>
+
+        <one-to-one field="previous" target-entity="Description" inversed-by="next"/>
+        <one-to-one field="next" target-entity="Description" mapped-by="previous"/>
+        <many-to-one field="updater" target-entity="Character" inversed-by="updated_descriptions"/>
+        <field name="ts" type="datetime"/>
+        <field name="cycle" type="integer"/>
+
+        <field name="text" type="text"/>
+    </entity>
+</doctrine-mapping>

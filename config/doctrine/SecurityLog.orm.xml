@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <doctrine-mapping>
-        <entity name="App\Entity\UserLog">
+        <entity name="App\Entity\SecurityLog">
                 <id name="id" type="integer">
                         <generator strategy="IDENTITY"/>
                 </id>
-                <many-to-one field="user" target-entity="User" inversed-by="logs"/>
-                <many-to-one field="character" target-entity="Character" inversed-by="userLogs"/>
+                <many-to-one field="user" target-entity="User" inversed-by="securityLogs"/>
 
                 <field name="ts" type="datetime"/>
                 <field name="ip" type="string"/>

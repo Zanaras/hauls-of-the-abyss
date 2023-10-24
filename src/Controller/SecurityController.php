@@ -116,13 +116,15 @@ class SecurityController extends AbstractController {
 	}
 
 	#[Route(path: '/characters', name: 'user_characters')]
-	public function characters(AuthenticationUtils $authenticationUtils): Response {
-		$user = $this->app->security(AppState::USER, 'user_characters', []);
+	public function characters(): Response {
+		$user = $this->app->security(AppState::USER, 'user_characters');
 		if ($user instanceof GuideKeeper) {
 			$this->addFlash('error', $this->trans->trans($user->getReason(), [], 'gatekeeper'));
 			return new RedirectResponse($user->getRoute());
 		}
 
-		return $this->render('security/characters.html.twig', ['characters' => $user->getCharacters(),]);
+		return $this->render('security/characters.html.twig', [
+			'characters' => $user->getCharacters(),
+		]);
 	}
 }
