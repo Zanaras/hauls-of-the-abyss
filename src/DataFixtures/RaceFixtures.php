@@ -15,7 +15,19 @@ class RaceFixtures extends Fixture {
 	private array $races = [
 		'human' => [
 			'size' => 'medium',
-		]
+			'public' => true,
+		],
+		'goblin' => [
+			'size' => 'small',
+			'Agility' => 1.2,
+			'Charisma' => 0.7,
+			'Constitution' => 0.7,
+			'Endurance' => 1.2,
+			'Intelligence' => 1,
+			'Spirit' => 1,
+			'Perception' => 1.2,
+			'public' => true,
+		],
 	];
 
 	public function load(ObjectManager $manager): void {

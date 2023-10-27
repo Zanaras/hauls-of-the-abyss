@@ -13,6 +13,7 @@
 		<field name="intelligence" type="float"/>
 		<field name="spirit" type="float"/>
 		<field name="perception" type="float"/>
+		<field name="public" type="boolean"/>
 
 	</entity>
 </doctrine-mapping>

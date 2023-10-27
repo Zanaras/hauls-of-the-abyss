@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{% trans('user.register.title', [], 'security') %}{% endblock %}
+{% block title %}{% trans('user.register.title', [], 'user') %}{% endblock %}
 
 {% block body %}
     {% for flash_error in app.flashes('verify_email_error') %}

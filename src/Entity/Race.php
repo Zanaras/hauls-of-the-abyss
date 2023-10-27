@@ -6,6 +6,7 @@ class Race {
 	private ?int $id = null;
 	private ?string $name = null;
 	private ?string $size = 'medium';
+	private bool $public = true;
 	private ?float $agility = 1;
 	private ?float $charisma = 1;
 	private ?float $constitution = 1;
@@ -104,6 +105,16 @@ class Race {
 
 	public function setPerception(float $perception): static {
 		$this->perception = $perception;
+
+		return $this;
+	}
+
+	public function isPublic(): ?bool {
+		return $this->public;
+	}
+
+	public function setPublic(bool $public): static {
+		$this->public = $public;
 
 		return $this;
 	}

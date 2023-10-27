@@ -6,8 +6,7 @@
 		</id>
 		<field name="name" type="string"/>
 		<field name="public" type="boolean"/>
-		<field name="shortDescription" type="text"/>
-		<field name="longDescription" type="text"/>
+		<field name="unlock" type="string"/>
 		<one-to-many field="skills" target-entity="OriginSkill" mapped-by="origin"/>
 
 	</entity>

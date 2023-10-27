@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class AppState {
 
-	# Constants for security return flags.
+	# Constants for user return flags.
 	const USER = 'u';
 	const CHAR = 'c';
 
@@ -39,7 +39,7 @@ class AppState {
 	}
 
 	/**
-	 * The security function does all the basic access checks for an authenticated user on routes we either want to log or need to perform second and third level checks on.
+	 * The user function does all the basic access checks for an authenticated user on routes we either want to log or need to perform second and third level checks on.
 	 * Checks all users if they are banned and, if exit checking applies, if they're using a trackable IP or not (so we can prevent multis).
 	 *
 	 * @param string $return
@@ -119,7 +119,7 @@ class AppState {
 	 * @return bool|string
 	 * @throws Exception
 	 */
-	public function generateAndCheckToken($length, $check = 'User', $against = 'reset_token'): bool|string {
+	public function generateAndCheckToken($length, $check = 'User', $against = 'resetToken'): bool|string {
 		$valid = false;
 		$token = false;
 		$em = $this->em;

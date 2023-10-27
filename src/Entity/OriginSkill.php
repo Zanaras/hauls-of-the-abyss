@@ -6,6 +6,7 @@ class OriginSkill {
 	private ?int $id = null;
 	private ?SkillType $skill = null;
 	private ?Origin $origin = null;
+	private float $mod = 1;
 
 	public function getId(): ?int {
 		return $this->id;
@@ -27,6 +28,16 @@ class OriginSkill {
 
 	public function setOrigin(?Origin $origin): static {
 		$this->origin = $origin;
+
+		return $this;
+	}
+
+	public function getMod(): ?float {
+		return $this->mod;
+	}
+
+	public function setMod(float $mod): static {
+		$this->mod = $mod;
 
 		return $this;
 	}

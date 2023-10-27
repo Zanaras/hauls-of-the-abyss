@@ -39,6 +39,9 @@ class SkillFixtures extends Fixture {
 
 		"medicine" => ['pro' => "medical"],
 		"anatomy" => ['pro' => "medical"],
+
+		"humanoids" => ['pro' => "anatomy"],
+		"monsters" => ['pro' => "anatomy"],
 	];
 	private array $skills = [
 		"tracking" => ['cat' => 'survival'],
@@ -49,7 +52,21 @@ class SkillFixtures extends Fixture {
 		"first aid" => ['cat' => 'medical'],
 		"surgery" => ['cat' => 'medical'],
 
-		"human anatomy" => ['cat' => 'anatomy'],
+		"human anatomy" => ['cat' => 'humanoids'],
+		"goblin anatomy" => ['cat' => 'humanoids'],
+
+		"invocation" => ['cat' => 'magic'],
+		"inscription" => ['cat' => 'magic'],
+		"life magic" => ['cat' => 'magic'],
+		"death magic" => ['cat' => 'magic'],
+		"fire magic" => ['cat' => 'magic'],
+		"water magic" => ['cat' => 'magic'],
+		"air magic" => ['cat' => 'magic'],
+		"earth magic" => ['cat' => 'magic'],
+		"light magic" => ['cat' => 'magic'],
+		"dark magic" => ['cat' => 'magic'],
+		"portals" => ['cat' => 'magic'],
+		"teleportation" => ['cat' => 'magic'],
 
 		"hunting" => ['cat' => "gathering"],
 		"husbandry" => ['cat' => "gathering"],
@@ -103,9 +120,7 @@ class SkillFixtures extends Fixture {
 
 		"flatbow" => ['cat' => 'bows'],
 		"longbow" => ['cat' => 'bows'],
-
-		"crossbow" => ['cat' => 'crossbows'],
-		"repeating crossbow" => ['cat' => 'crossbows'],
+		"crossbow" => ['cat' => 'bows'],
 
 		"throwing knife" => ['cat' => 'thrown'],
 		"throwing axe" => ['cat' => 'thrown'],

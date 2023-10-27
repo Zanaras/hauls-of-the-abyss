@@ -5,6 +5,7 @@ namespace App\Entity;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 
 class Character {
 	private ?string $name = null;
@@ -215,12 +216,12 @@ class Character {
    		if ($description === null && $this->description !== null) {
    			$this->description->setActiveCharacter(null);
    		}
-
+   
    		// set the owning side of the relation if necessary
    		if ($description !== null && $description->getActiveUser() !== $this) {
    			$description->setActiveCharacter($this);
    		}
-
+   
    		$this->description = $description;
    
    		return $this;

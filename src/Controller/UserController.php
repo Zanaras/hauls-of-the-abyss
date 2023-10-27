@@ -23,9 +23,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 /**
- * User Controller is for anything that creates, modifies, or removes user accounts or user security controls, lets someone login or logout, or lets someone access something that only makes sense if you're logged in but not playing.
+ * User Controller is for anything that creates, modifies, or removes user accounts or user user controls, lets someone login or logout, or lets someone access something that only makes sense if you're logged in but not playing.
  */
-class SecurityController extends AbstractController {
+class UserController extends AbstractController {
 	private EmailVerifier $emailVerifier;
 	private TranslatorInterface $trans;
 	private AppState $app;
@@ -44,7 +44,7 @@ class SecurityController extends AbstractController {
 		// last username entered by the user
 		$lastUsername = $authenticationUtils->getLastUsername();
 
-		return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error,]);
+		return $this->render('user/login.html.twig', ['last_username' => $lastUsername, 'error' => $error,]);
 	}
 
 	#[Route(path: '/logout', name: 'user_logout')]
@@ -82,10 +82,66 @@ class SecurityController extends AbstractController {
 			return $this->redirectToRoute('index');
 		}
 
-		return $this->render('security/register.html.twig', ['registrationForm' => $form->createView(),]);
+		return $this->render('user/register.html.twig', ['registrationForm' => $form->createView(),]);
 	}
 
-	#[Route('/verify/email', name: 'user_verify_email')]
+	#[Route ('/user/reset', name:'user_reset')]
+	public function reset(AppState $app, EntityManagerInterface $em, MailManager $mail, TranslatorInterface $trans, Request $request, UserPasswordHasherInterface $passwordHasher, string $token = '0', string $email = '0'): RedirectResponse|Response {
+		if ($token == '0') {
+			$form = $this->createForm(RequestResetFormType::class);
+			$form->handleRequest($request);
+			if ($form->isSubmitted() && $form->isValid()) {
+				$data = $form->getData();
+				$user = $em->getRepository(User::class)->findOneByEmail($data['text']);
+				if (!$user) {
+					$user = $em->getRepository(User::class)->findOneByUsername($data['text']);
+				}
+				if ($user) {
+					$user->setResetToken($app->generateAndCheckToken(64, 'User', 'resetToken'));
+					$em->flush();
+					$link = $this->generateUrl('maf_account_reset', ['token' => $user->getResetToken(), 'email'=>$user->getEmail()], UrlGeneratorInterface::ABSOLUTE_URL);
+					$text = $trans->trans(
+						'user.reset.email.text', [
+						'%sitename%' => $_ENV['SITE_NAME'],
+						'%link%' => $link,
+						'%adminemail%' => $_ENV['ADMIN_EMAIL']
+					], 'security');
+					$subject = $trans->trans('user.reset.email.subject', ['%sitename%' => $_ENV['SITE_NAME']], 'security');
+
+					$mail->sendEmail($user->getEmail(), $subject, $text);
+					$this->addFlash('notice', $trans->trans('user.reset.flash.requested', [], 'security'));
+				}
+				return new RedirectResponse($this->generateUrl('public_index'));
+			}
+			return $this->render('user/reset.html.twig', [
+				'form' => $form->createView(),
+			]);
+		} else {
+			$user = $em->getRepository(User::class)->findOneBy(['reset_token' => $token, 'email' => $email]);
+			if ($user) {
+				$form = $this->createForm(ResetPasswordFormType::class);
+				$form->handleRequest($request);
+				if ($form->isSubmitted() && $form->isValid()) {
+					$user->setPassword($passwordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
+					$user->setLastPassword(new \DateTime('now'));
+					$user->unsetResetToken();
+					$user->unsetResetTime();
+					$em->flush();
+
+					$this->addFlash('notice', $trans->trans('user.reset.flash.completed', [], 'security'));
+					return new RedirectResponse($this->generateUrl('public_index'));
+				}
+				return $this->render('user/reset.html.twig', [
+					'form' => $form->createView(),
+				]);
+			} else {
+				$app->logSecurityViolation($request->getClientIP(), 'core_reset', $this->getUser(), 'bad reset');
+				return new RedirectResponse($this->generateUrl('public_index'));
+			}
+		}
+	}
+
+	#[Route('/user/verify', name: 'user_verify_email')]
 	public function verifyUserEmail(Request $request, EntityManagerInterface $manager): Response {
 		$id = $request->query->get('id');
 
@@ -123,7 +179,7 @@ class SecurityController extends AbstractController {
 			return new RedirectResponse($user->getRoute());
 		}
 
-		return $this->render('security/characters.html.twig', [
+		return $this->render('user/characters.html.twig', [
 			'characters' => $user->getCharacters(),
 		]);
 	}

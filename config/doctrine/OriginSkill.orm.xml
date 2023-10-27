@@ -4,6 +4,7 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
+		<field name="mod" type="float"/>
 		<many-to-one field="skill" target-entity="SkillType" invesred-by="origins"/>
 		<many-to-one field="origin" target-entity="Origin" inversed-by="skills"/>
 

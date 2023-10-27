@@ -14,8 +14,8 @@ use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
- * GateKeeper handles all in-character route security.
- * If Symfony firewall is Tier 1 of security, then AppState does Tier 2, and this does Tier 3.
+ * GateKeeper handles all in-character route user.
+ * If Symfony firewall is Tier 1 of user, then AppState does Tier 2, and this does Tier 3.
  */
 class GateKeeper {
 
