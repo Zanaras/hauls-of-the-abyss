@@ -23,6 +23,11 @@
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="user"/>
 		<one-to-one field="description" target-entity="Description" mapped-by="active_user"/>
 		<one-to-many field="updatedDescriptions" target-entity="Description" mapped-by="updater" fetch="EXTRA_LAZY"/>
+		<one-to-many field="journals" target-entity="Journal" mapped-by="character" fetch="EXTRA_LAZY">
+			<order-by>
+				<order-by-field name="date" direction="DESC"/>
+			</order-by>
+		</one-to-many>
 
 
 		<!--

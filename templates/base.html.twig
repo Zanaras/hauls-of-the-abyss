@@ -12,20 +12,41 @@
         {% endblock %}
     </head>
     <body>
-        <div id="nav">
-            {% include 'parts/nav.html.twig' %}
+        <div id="symfony-wrapper" data-role="page">
+            <div style="clear: both"></div>
+            <div id="nav">
+                {% include 'parts/nav.html.twig' %}
+            </div>
+            <div id="content" data-role="content">
+                {% for fLabel, fMessages in app.flashes(['error', 'warning', 'notice']) %}
+                    {% for fMessage in fMessages %}
+                        <div class="flash-{{ fLabel }}">
+                            {{ fMessage|trans|raw }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                {% block body %}{% endblock %}
+            </div>
+            {% block javascripts %}{% endblock %}
         </div>
-        <div id="content">
-            {% block body %}{% endblock %}
-        </div>
-        {% block javascripts %}{% endblock %}
-    </body>
-</html>
 
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="flash-{{ label }}">
-            {{ message }}
+        <div id="footer" data-role="footer">
+                <div>
+                    Server time: {{ "now"|date("H:i") }}<br />
+                </div>
+                <hr />
+            {% if app.environment != 'prod' %}
+                <div>environment: {{ app.environment }}</div>
+            {% endif %}
+            <div>&copy;2013-2022 by Iungard Systems, LLC</div>
+
         </div>
-    {% endfor %}
-{% endfor %}
+        <script type="text/javascript">
+            {% block javascript %}
+            {% endblock %}
+            {% block jquery %}
+            {% endblock %}
+        </script>
+    </body>
+
+</html>

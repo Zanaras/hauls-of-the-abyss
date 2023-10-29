@@ -1,12 +1,12 @@
 <u>Main Menu</u>
 <ul class="navbar">
-        <li><a href="{{ url("public_index") }}">{{ 'nav.index'|trans({}, "public") }}</a></li>
+        <li><a href="{{ url("public_index") }}">Home</a></li>
         {% if app.user %}
-                <li><a href="{{ url("user_logout") }}">{{ 'nav.logout'|trans({}, "public") }}</a></li>
-                <!--<li><a href="{{ url("user_account") }}">{{ 'nav.profile'|trans({}, "public") }}</a></li>-->
-                <li><a href="{{ url("user_characters") }}">{{ 'nav.characters'|trans({}, "public") }}</a></li>
+                <li><a href="{{ url("user_logout") }}">Logout</a></li>
+                <!--<li><a href="{{ url("user_account") }}">Profile</a></li>-->
+                <li><a href="{{ url("user_characters") }}">Characters</a></li>
         {% else %}
-                <li><a href="{{ url("user_login") }}">{{ 'nav.login'|trans({}, "public") }}</a></li>
-                <li><a href="{{ url("user_register") }}">{{ 'nav.register'|trans({}, "public") }}</a></li>
+                <li><a href="{{ url("user_login") }}">Login</a></li>
+                <li><a href="{{ url("user_register") }}">Register</a></li>
         {% endif %}
 </ul>
