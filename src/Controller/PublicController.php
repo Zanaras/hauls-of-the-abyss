@@ -24,16 +24,18 @@ class PublicController extends AbstractController {
 			$user = new User();
 			$form = $this->createForm(RegistrationFormType::class, $user, ['action'=>$this->generateUrl('user_register'), 'labels'=>false]);
 		}
+		$update = $em->createQuery('SELECT u from App:UpdateNote u ORDER BY u.id DESC')->setMaxResults(1)->getResult();
 		return $this->render('public/index.html.twig', [
 			'controller_name' => 'PublicController',
 			'form' => $form->createView(),
 			'journals' => $journals,
+			'update' => $update,
 		]);
 	}
 
 	#[Route ('/needIP', name: 'public_ip_needed')]
 	public function needIp(AppState $app): Response {
-		$app->security('v', 'ip_needed', [], true);
+		$app->security('ip_needed', [], true);
 		return $this->render('public/needip.html.twig');
 	}
 

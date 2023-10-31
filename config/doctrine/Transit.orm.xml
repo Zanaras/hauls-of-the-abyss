@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\Transit">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="dungeon" target-entity="Dungeon"/>
+		<many-to-one field="type" target-entity="TransitType"/>
+		<many-to-one field="fromRoom" target-entity="Room" inversed-by="exits"/>
+		<many-to-one field="toRoom" target-entity="Room" inversed-by="entrances"/>
+
+		<field name="transits" type="bigint"/>
+
+	</entity>
+</doctrine-mapping>

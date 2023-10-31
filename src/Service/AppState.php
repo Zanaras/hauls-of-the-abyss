@@ -2,18 +2,19 @@
 
 namespace App\Service;
 
+use App\Entity\AppSetting;
 use App\Entity\Character;
 use App\Entity\GuideKeeper;
 use App\Entity\NetExit;
+use App\Entity\Origin;
 use App\Entity\SecurityLog;
 use App\Entity\User;
 use App\Entity\UserLog;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use LogicException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * AppState is all the bare essential functions that are expected to be called just about anywhere.
@@ -30,12 +31,91 @@ class AppState {
 	const DUNGEON = 2;
 	const WILDS = 3;
 
+	const SETTINGTYPES = ['string', 'bool', 'int', 'float'];
+
 	private EntityManagerInterface $em;
 	private Security $security;
 
 	public function __construct(EntityManagerInterface $em, Security $security) {
 		$this->em = $em;
 		$this->security = $security;
+	}
+
+	/**
+	 * Fetch a setting from the game's setting database table, optionally with a default value if the setting hasn't been formally set elsewhere.
+	 *
+	 * @param string 			$name
+	 * @param string|int|float|bool   	$default
+	 *
+	 * @return string|int|float|bool
+	 */
+	public function getGlobal(string $name, string|int|float|bool $default=false) {
+		$setting = $this->em->getRepository(AppSetting::class)->findOneBy(['name'=>$name]);
+		if (!$setting) return $default;
+		return match ($setting->getType()) {
+			'int' => (int)$setting->getValue(),
+			'float' => (float)$setting->getvalue(),
+			'bool' => (bool)$setting->getValue(),
+			default => (string)$setting->getValue(),
+		};
+	}
+
+	/**
+	 * Commits a global setting to the database, creating a new entry if necessary.
+	 *
+	 * @param string                $name	Name of the setting
+	 * @param string|int|float|bool $value  Value of the setting
+	 * @param string                $type   Variable type of the setting, used in type-casting the return value.
+	 *
+	 * @return AppSetting		Object version of the setting you just set.
+	 */
+	public function setGlobal(string $name, string|int|float|bool $value, string $type = 'string'): AppSetting {
+		if (in_array($type, $this::SETTINGTYPES)) {
+			$setting = $this->em->getRepository(AppSetting::class)->findOneBy(['name'=>$name]);
+			if (!$setting) {
+				$setting = new AppSetting();
+				$setting->setName($name);
+				$setting->setType($type);
+				$this->em->persist($setting);
+			}
+			$setting->setValue($value);
+			$this->em->flush($setting);
+			return $setting;
+		} else {
+			throw new \LogicException("Bad global type set. Must be 'string', 'int', 'float', or 'bool'.");
+		}
+
+	}
+
+	/**
+	 * fetchGlobal both checks and returns a global that is set, but also creates and returns it if is not.
+	 * Slightly slower than getGlobal, but probably not noticeable to users.
+	 * @param string                $name		Name of the global setting
+	 * @param string|int|float|bool $default	Default value of the setting -- overridden if the setting already exists.
+	 * @param string                $type		Type of the value that should be returned.
+	 *
+	 * @return float|bool|int|string
+	 */
+	public function fetchGlobal(string $name, string|int|float|bool $default, string $type = 'string'): float|bool|int|string {
+		if (in_array($type, $this::SETTINGTYPES)) {
+			$setting = $this->em->getRepository(AppSetting::class)->findOneBy(['name'=>$name]);
+			if (!$setting) {
+				$setting = new AppSetting;
+				$setting->setName($name);
+				$setting->setType($type);
+				$setting->setValue($default);
+				$this->em->persist($setting);
+				$this->em->flush();
+			}
+			return match ($setting->getType()) {
+				'int' => (int)$setting->getValue(),
+				'float' => (float)$setting->getvalue(),
+				'bool' => (bool)$setting->getValue(),
+				default => (string)$setting->getValue(),
+			};
+		} else {
+			throw new \LogicException("Bad global type set. Must be 'string', 'int', 'float', or 'bool'.");
+		}
 	}
 
 	/**
@@ -50,7 +130,7 @@ class AppState {
 	 *
 	 * @return User|Character|GuideKeeper|null
 	 */
-	public function security(string $return, string $route, array $slugs = [], bool $override = false, bool $flush = true): User|Character|GuideKeeper|null {
+	public function security(string $route, array $slugs = [], bool $override = false, bool $flush = true): User|Character|GuideKeeper|null {
 		$user = $this->security->getUser();
 		/** @var User $user */
 		if ($this->security->isGranted('IS_AUTHENTICATED')) {
@@ -66,16 +146,7 @@ class AppState {
 			if ($override || $user->getWatched()) {
 				$this->logUser($user, $route, $slugs, $flush);
 			}
-			if ($return === 'u') {
-				return $user;
-			} elseif ($return === 'c') {
-				$char = $user->getCurrentCharacter();
-				if ($char) {
-					return $char;
-				} else {
-					return new GuideKeeper('user_characters', 'appState.noChar');
-				}
-			}
+			return $user;
 		}
 		return null;
 	}
@@ -102,10 +173,9 @@ class AppState {
 	 * @throws Exception
 	 */
 	public function generateToken($length = 128, $method = 'trimbase64'): string {
-		$token = match ($method) {
+		return match ($method) {
 			default => rtrim(strtr(base64_encode(random_bytes($length)), '+/', '-_'), '='),
 		};
-		return $token;
 	}
 
 	/**
@@ -215,7 +285,26 @@ class AppState {
 		return false;
 	}
 
-	public function findAvailableOrigins(Character $user) {
+	public function findAvailableOrigins(User $user) {
+		$all = new ArrayCollection();
+		$public = $this->em->getRepository(Origin::class)->findBy(['public'=>true]);
+		foreach ($public as $each) {
+			$all->add($each);
+		}
+		foreach ($user->getUnlockedOrigins() as $each) {
+			$all->add($each->getOrigin());
+		}
+		return $all;
+	}
 
+	public function checkCharacterLimit(User $user): array {
+		$characters_allowed = $this->fetchGlobal('activeCharacters', 1, 'int');
+		$characters_active = $user->getActiveCharacters()->count();
+		if ($characters_active > $characters_allowed) {
+			$make_more = false;
+		} else {
+			$make_more = true;
+		}
+		return [$make_more, $characters_active, $characters_allowed];
 	}
 }

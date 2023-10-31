@@ -32,6 +32,7 @@ class OriginFixtures extends Fixture {
 		],
 		'mafDeath' => [
 			'public' => false,
+			'unlock' => 'maf',
 			'skills' => [
 				'short sword' => 1.1,
 				'long sword' => 1.1,
@@ -46,6 +47,7 @@ class OriginFixtures extends Fixture {
 		],
 		'mafPortal' => [
 			'public' => false,
+			'unlock' => 'maf',
 			'skills' => [
 				'short sword' => 1.1,
 				'long sword' => 1.1,
@@ -60,6 +62,7 @@ class OriginFixtures extends Fixture {
 		],
 		'bmDeath' => [
 			'public' => false,
+			'unlock' => 'bm',
 			'skills' => [
 				'short sword' => 1.1,
 				'long sword' => 1.1,
@@ -72,6 +75,7 @@ class OriginFixtures extends Fixture {
 		],
 		'bmPortal' => [
 			'public' => false,
+			'unlock' => 'bm',
 			'skills' => [
 				'short sword' => 1.2,
 				'long sword' => 1.2,
@@ -84,6 +88,7 @@ class OriginFixtures extends Fixture {
 		],
 		'dungeonMaster' => [
 			'public' => false,
+			'unlock' => 'dm',
 			'skills' => [
 				'dungeoneering' => 1.1,
 				'invocation' => 1.1,
@@ -93,6 +98,7 @@ class OriginFixtures extends Fixture {
 		],
 		'worldBuilder' => [
 			'public' => false,
+			'unlock' => 'lemuria',
 			'skills' => [
 				'invocation' => 1.1,
 				'inscription' => 1.1,
@@ -112,6 +118,7 @@ class OriginFixtures extends Fixture {
 				$manager->persist($origin);
 				$origin->setName($name);
 			}
+			$origin->setUnlock($data['unlock']);
 			$manager->flush();
 			echo 'Updating existing skills...';
 			foreach ($origin->getSkills() as $skill) {

@@ -74,7 +74,7 @@ class UserController extends AbstractController {
 					->from(new Address($_ENV['FROM_EMAIL'], $_ENV['FROM_NAME']))
 					->to($user->getEmail())
 					->subject('Please Confirm your Email')
-					->htmlTemplate('registration/confirmation_email.html.twig')
+					->htmlTemplate('user/confirmation_email.html.twig')
 			);
 			// do anything else you need here, like send an email
 

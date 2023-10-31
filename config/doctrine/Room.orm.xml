@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\Room">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="dungeon" target-entity="Dungeon" inversed-by="rooms"/>
+		<many-to-one field="type" target-entity="RoomType"/>
+		<one-to-many field="characters" target-entity="Character" mapped-by="room"/>
+		<one-to-many field="exits" target-entity="Transit" mapped-by="toRoom"/>
+		<one-to-many field="entrances" target-entity="Transit" mapped-by="fromRoom"/>
+
+		<field name="visits" type="bigint"/>
+
+	</entity>
+</doctrine-mapping>

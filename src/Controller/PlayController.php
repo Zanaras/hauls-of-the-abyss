@@ -8,8 +8,11 @@ use App\Form\CharacterCreatorType;
 use App\Service\AppState;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -28,13 +31,12 @@ class PlayController extends AbstractController {
 
 	#[Route('/play/{char}', name: 'play_character', requirements: ['char'=>'\d+'])]
 	public function playCharacter(Character $char): Response {
-		$user = $this->app->security('u', 'play_character', ['character'=>$char->getId()], false, false);
+		$user = $this->app->security('play_character', ['character'=>$char->getId()], false, false);
 		if ($user instanceof GuideKeeper) {
 			$this->addFlash('error', $this->trans->trans($user->getReason(), [], 'gatekeeper'));
 			return new RedirectResponse($user->getRoute());
 		}
 		if ($user->getCharacters()->contains($char)) {
-			$this->em->flush(); # Flush here, so if this attempt is malicious, we can commit both at once.
 			if ($char->isActive()) {
 				$user->setCurrentCharacter($char);
 				switch ($char->getAreaCode()) {
@@ -61,20 +63,44 @@ class PlayController extends AbstractController {
 			$this->addFlash('erorr', $this->trans->trans('user.character.mismatch', [], 'gatekeeper'));
 			return $this->redirectToRoute('user_characters');
 		}
-
 	}
 
 	#[Route('/play/create', name: 'play_create_character')]
-	public function createCharacter(): Response|RedirectResponse {
-		$user = $this->app->security('u', 'play_create_character');
+	public function createCharacter(Request $request): Response|RedirectResponse {
+		$user = $this->app->security('play_create_character');
 		if ($user instanceof GuideKeeper) {
 			$this->addFlash('error', $this->trans->trans($user->getReason(), [], 'gatekeeper'));
 			return new RedirectResponse($user->getRoute());
 		}
-		$form = $this->createForm(CharacterCreatorType::class, null, ['origins'=>$this->app->findAvailableOrigins($user)]);
+		[$makeMore, $activeChars, $allowedChars] = $this->app->checkCharacterLimit($user);
+		if (!$makeMore) {
+			throw new AccessDeniedHttpException('newcharacter.overlimit');
+		}
+		$availableOrigins = $this->app->findAvailableOrigins($user);
+		$form = $this->createForm(CharacterCreatorType::class, null, ['origins'=>$availableOrigins]);
+		$form->handleRequest($request);
 
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = $form->getData();
+			if (!$availableOrigins->contains($data['origin'])) {
+				$form->addError(new FormError('Selected origin not in list of available origins.'));
+			} else {
+				$char = new Character();
+				$char->setName($data['name']);
+				$char->setGender($data['gender']);
+				$char->setOrigin($data['origin']);
+				$char->setRace($data['race']);
+				$char->setAreaCode(AppState::MU);
+				$this->em->persist($char);
+				$this->em->flush();
+				$this->redirectToRoute('play_character', ['char'=>$char->getId()]);
+			}
+		}
 		return $this->render('play/create.html.twig', [
 			'form'=>$form->createView(),
+			'makeMore'=>$makeMore,
+			'activeChars'=>$activeChars,
+			'allowedChars'=>$allowedChars,
 		]);
 	}
 }

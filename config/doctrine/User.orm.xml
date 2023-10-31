@@ -36,6 +36,10 @@
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="user"/>
 		<one-to-one field="description" target-entity="Description" mapped-by="active_user"/>
 
+		<one-to-many field="reports" target-entity="UserReport" mapped-by="user" fetch="EXTRA_LAZY"/>
+		<one-to-many field="reports_against" target-entity="UserReportAgainst" mapped-by="user" fetch="EXTRA_LAZY"/>
+		<one-to-many field="added_report_notes" target-entity="UserReportNote" mapped-by="from" fetch="EXTRA_LAZY"/>
+
 		<unique-constraints>
 			<unique-constraint columns="username" />
 			<unique-constraint columns="email" />

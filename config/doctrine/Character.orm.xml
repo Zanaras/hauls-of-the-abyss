@@ -20,6 +20,7 @@
 		<many-to-one field="user" target-entity="User" inversed-by="characters" fetch="EAGER"/>
 		<one-to-many field="userLogs" target-entity="UserLog" mapped-by="character" fetch="EXTRA_LAZY"/>
 		<many-to-one field="race" target-entity="Race" fetch="EAGER"/>
+		<many-to-one field="origin" target-entity="Origin" fetch="EAGER"/>
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="user"/>
 		<one-to-one field="description" target-entity="Description" mapped-by="active_user"/>
 		<one-to-many field="updatedDescriptions" target-entity="Description" mapped-by="updater" fetch="EXTRA_LAZY"/>
@@ -28,6 +29,7 @@
 				<order-by-field name="date" direction="DESC"/>
 			</order-by>
 		</one-to-many>
+		<many-to-one field="room" target-entity="Room" inversed-by="characters"/>
 
 
 		<!--

@@ -1,0 +1,9 @@
+# Hauls of the Abyss
+# Text translation strings for site gatekeeper errors.
+# Author: Andrew Gwynn
+# Contact: hotateam@lemuriacommunity.org
+
+user:
+  character:
+    dead: The character your attempting to play appears to be dead.
+    mismatch: The character your attempting to play doesn't appear to be a playable character.

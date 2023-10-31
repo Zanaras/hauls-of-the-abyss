@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\ActivityReport;
 use App\Entity\BattleReport;
 use App\Entity\Character;
+use App\Entity\GuideKeeper;
 use App\Entity\Journal;
 use App\Entity\UserReport;
 use App\Form\JournalType;
@@ -34,29 +35,25 @@ class JournalController extends AbstractController {
 
 	#[Route ('/journal/{id}', name: 'journal_read', requirements: ['id' => '\d+'])]
 	public function journalAction(Journal $id): RedirectResponse|Response {
-		$char = $this->app->getCharacter(false, true, true); #Not required, allow dead, allow not started.
-		$user = $this->getUser();
-		if ($char instanceof Character) {
-			$gm = $this->isGranted('ROLE_OLYMPUS');
-			$admin = $this->isGranted('ROLE_ADMIN');
-		} else {
+		$user = $this->app->security('journal_read', ['id'=>$id->getId()]);
+		if ($user instanceof GuideKeeper) {
 			$gm = false;
 			$admin = false;
+		} else {
+			$gm = $this->isGranted('ROLE_OLYMPUS');
+			$admin = $this->isGranted('ROLE_ADMIN');
 		}
 		$bypass = false;
 		if ($id->isPrivate() && !$gm) {
-			if ($char && $char !== $id->getCharacter()) {
-				$this->addFlash('notice', $this->trans->trans('journal.view.redirect', [], 'messages'));
-				return $this->redirectToRoute('maf_char');
-			} elseif (!$char) {
-				$this->addFlash('notice', $this->trans->trans('journal.view.redirect', [], 'messages'));
-				return $this->redirectToRoute('maf_chars');
+			if (!$user || ($user && $user !== $id->getCharacter()->getUser())) {
+				$this->addFlash('notice', "Sorry, but this journal entry is private, and you don't have access to it.");
+				return $this->redirectToRoute('user_characters');
 			}
 		} elseif ($id->isPrivate() && $gm) {
 			$bypass = true;
 		}
 
-		return $this->render('Journal/view.html.twig', [
+		return $this->render('journal/view.html.twig', [
 			'journal' => $id,
 			'user' => $user,
 			'gm' => $gm,
@@ -86,11 +83,11 @@ class JournalController extends AbstractController {
 			if (!$journal->isPrivate() && !$journal->isGraphic()) {
 				$note->spoolJournal($journal);
 			}
-			$this->addFlash('notice', $this->trans->trans('journal.write.success', [], 'messages'));
+			$this->addFlash('notice', "Your journal has been written successfully!");
 			return $this->redirectToRoute('maf_journal_mine');
 		}
 
-		return $this->render('Journal/write.html.twig', [
+		return $this->render('journal/write.html.twig', [
 			'form' => $form->createView(),
 		]);
 	}
@@ -120,14 +117,14 @@ class JournalController extends AbstractController {
 			return $this->redirectToRoute($character);
 		}
 
-		return $this->render('Journal/mine.html.twig', [
+		return $this->render('journal/mine.html.twig', [
 			'char' => $character,
 		]);
 	}
 
 	#[Route ('/journal/user/{id}', name: 'journal_character', requirements: ['id' => '\d+'])]
 	public function journalCharacterAction(Character $id): Response {
-		return $this->render('Journal/user.html.twig', [
+		return $this->render('journal/user.html.twig', [
 			'char' => $id,
 		]);
 	}

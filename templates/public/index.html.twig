@@ -6,7 +6,8 @@
     <div class="index_journal">
         <div class="subcontent">
             <h2>Announcements</h2>
-            <p>Welcome to a very early build for Hauls of the Abyss. There isn't much to see here yet, but maybe soon there will be.</p>
+            <p>Welcome to a very early build for Hauls of the Abyss. There isn't much to see here yet, but maybe soon
+                there will be.</p>
         </div>
         <div class="subcontent">
             <h2>Recent Journal Entries</h2>
@@ -17,7 +18,8 @@
                     {{ 'journal.view.by'|trans({'%character%':link(journal.getCharacter), "%ts%":journal.getDate|date}, "messages")|raw }}
                     {% set length = journal.length %}
                     {% if length > 500 %}
-                        {{ ((journal.entry|slice(0,500))~'...')|markdown_to_html|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>') }}<a href="{{ path('journal_read', {"id":journal.id}) }}">Read more...</a></p>
+                        {{ ((journal.entry|slice(0,500))~'...')|markdown_to_html|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>') }}
+                        <a href="{{ path('journal_read', {"id":journal.id}) }}">Read more...</a></p>
                     {% else %}
                         {{ journal.entry|markdown_to_html|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>') }}
                     {% endif %}
@@ -27,7 +29,8 @@
     </div>
     <div style="font-size:1.2em" class="index_maincontent">
         <h1>Delve into the Abyss</h1>
-        <p>Hauls fo the Abyss, a persisitent, online, optionally-multiplayer, dungeon crawler in procedurally generated, infinite dungeon.</p>
+        <p>Hauls fo the Abyss, a persisitent, online, optionally-multiplayer, dungeon crawler in procedurally generated,
+            infinite dungeon.</p>
         {% if app.user and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
         {% else %}
             <div class="index_register">
@@ -42,30 +45,31 @@
                 {{ form_end(form) }}
             </div>
             <div class="index_login">
-                    <form action="{{ path('user_login') }}" method="post">
-                        <h2>Log In</h2>
-                        {#<label for="username">Username: </label>#}
-                        <input type="text" name="_username" id="username" placeholder="Username" required><br>
-                        {# <label for="password" class="sr-only">Password: </label>#}
-                        <input type="password" name="_password" id="password" placeholder="Password" required>
+                <form action="{{ path('user_login') }}" method="post">
+                    <h2>Log In</h2>
+                    {# <label for="username">Username: </label> #}
+                    <input type="text" name="_username" id="username" placeholder="Username" required><br>
+                    {# <label for="password" class="sr-only">Password: </label> #}
+                    <input type="password" name="_password" id="password" placeholder="Password" required>
 
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                        <div class="checkbox mb-3">
-                            <label>
-                                <input type="checkbox" name="_remember_me" checked/> Keep me logged in
-                            </label>
-                        </div>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="checkbox mb-3">
+                        <label>
+                            <input type="checkbox" name="_remember_me" checked/> Keep me logged in
+                        </label>
+                    </div>
 
-                        <input type="hidden" name="_target_path" value="{{ path('user_characters') }}"/>
+                    <input type="hidden" name="_target_path" value="{{ path('user_characters') }}"/>
 
-                        <button class="submit" type="submit">
-                            Sign in
-                        </button><br>
-                        <!-- TODO: Password reset form. -->
-                        <!--<a href="{{ url("user_reset") }}">Reset Password</a> -->
-                    </form>
+                    <button class="submit" type="submit">
+                        Sign in
+                    </button>
+                    <br>
+                    <!-- TODO: Password reset form. -->
+                    <!--<a href="{{ url("user_reset") }}">Reset Password</a> -->
+                </form>
             </div>
         {% endif %}
     </div>
-    <br class="clear" />
+    <br class="clear"/>
 {% endblock %}
