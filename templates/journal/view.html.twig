@@ -1,36 +1,36 @@
-{% extends "layout.html.twig" %}
+{% extends "base.html.twig" %}
 
 {% block content %}
-	<h2>{{ 'journal.view.header'|trans({}, "messages")|raw }}</h2>
-	{{ 'journal.view.intro'|trans({}, "messages")|raw }}
+	<h2>Read a Journal Entry</h2>
+	<p>Journals are player created messages about things in game. Most of the time these can be considered to be known things, as somethig your character heard via rumor, though they can also be flagged as out of character information that is really only meant for your enjoyment as a player rather than for use by your characters (unless they happen to know of it some other way.) </p>
 	<div class="subcontent"/>
-	{% if journal.ooc %}
-		<div class="warning leftmain">{{ 'journal.ooc'|trans({}, "messages") }}</div>
-	{% endif %}
-	{% if bypass %}
-		<div class="warning leftmain">GM Detected. Normal security rules bypassed.</div>
-	{% endif %}
-	<h2>{{ journal.topic|trans({}, "messages")|title }}</h2>
-	{{ 'journal.view.by'|trans({'%character%':link(journal.character), "%day%":journal.cycle|gametime("short"), "%ts%":journal.date|date}, "messages")|raw }}
-	<hr>
-	{{ journal.entry|markdown_to_html|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
+		{% if journal.ooc %}
+			<div class="warning leftmain">The author of this Journal has flagged it as "Out of Character Content", so it is meant for your enjoyment as a player rather than as something you can have your characters know about.</div>
+		{% endif %}
+		{% if bypass %}
+			<div class="warning leftmain">GM Detected. Normal security rules bypassed.</div>
+		{% endif %}
+		<h2>{{ journal.topic|title }}</h2>
+		<i>Written by {{ journal.character|link(journal.character) }} on {{ journal.ts|date }}.</i>
+		<hr>
+		{{ journal.entry|markdown_to_html|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
 	</div>
 
 	{% if journal.character.journals.count > 0 %}
-		<a href="{{ path("maf_journal_character", {'id':journal.character.id}) }}">{{ 'journal.view.others'|trans|title }}</a>
+		<a href="{{ path("journal_character", {'id':journal.character.id}) }}">{{ 'journal.view.others'|trans|title }}</a>
 	{% endif %}
 	{% if not journal.GMReviewed and journal.character and journal.character.user != user %}
-		<p><a href="{{ path('maf_journal_report', {"id":journal.id}) }}">{{ 'journal.report'|trans({}, "messages") }}</a><br><br>
+		<p><a href="{{ path('journal_report', {"id":journal.id}) }}">{{ 'journal.report'|trans({}, "messages") }}</a><br><br>
 		{% if gm %}
-			<h4>{{ 'journal.gm.actions'|trans({}, "messages")}}<br>
+			<h4>GM Actions<br>
 			<p>Public or Private? {% if journal.public %}<b>Public</b>{% elseif jounal.GMPrivate %}<b>Forced Private</b>{% else %}<b>Private</b>{% endif %}.<br>
 			Graphic or Safe? {% if journal.graphic %}<b>Graphic</b>{% elseif journal.GMGraphic %}<b>Forced Graphic</b>{% else %}<b>Safe</b>{% endif %}.<br>
 			GM reviewed? {% if journal.pendingReview %}<b>Pending Review</b>{% elseif journal.GMReviewed %}<b>Yes</b>{% else %}<i>Not Requested</i>{% endif %}.<br></p>
 
-			<p><a href="{{ path('maf_journal_gmprivate', {"id":journal.id}) }}">{{ 'journal.gm.private.link'|trans({}, "messages") }}</a> | <a href="{{ path('maf_journal_gmgraphic', {"id":journal.id}) }}">{{ 'journal.gm.graphic.link'|trans({}, "messages") }}</a></p>
+			<p><a href="{{ path('journal_gmprivate', {"id":journal.id}) }}">{{ 'journal.gm.private.link'|trans({}, "messages") }}</a> | <a href="{{ path('maf_journal_gmgraphic', {"id":journal.id}) }}">{{ 'journal.gm.graphic.link'|trans({}, "messages") }}</a></p>
 		{% endif %}
 		{% if admin %}
-			<p><a href="{{ path('maf_journal_gmremove', {"id":journal.id}) }}">{{ 'journal.gm.remove'|trans({}, "messages") }}</a></p>
+			<p><a href="{{ path('journal_gmremove', {"id":journal.id}) }}">{{ 'journal.gm.remove'|trans({}, "messages") }}</a></p>
 		{% endif %}
 	{% endif %}
 {% endblock %}

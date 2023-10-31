@@ -1,31 +1,9 @@
-{% extends "layout.html.twig" %}
+{% extends "base.html.twig" %}
 
 {% block content %}
-	<h2>{{ 'journal.write.header'|trans({}, "messages")|raw }}</h2>
-	{% if report is defined %}
-		<p>{{ 'journal.write.intro2'|trans({'%report%':link(report)}, "messages")|raw }}</p>
-	{% else %}
-		<p>{{ 'journal.write.intro'|trans({}, "messages")|raw }}</p>
-	{% endif %}
-	<p><div id="insertbox">
-		<input id="realmsearch" placeholder="insert realm" />
-		<input id="guildsearch" placeholder="insert association" />
-		<input id="housesearch" placeholder="insert house" />
-		<input id="placesearch" placeholder="insert place" />
-		<input id="settlementsearch" placeholder="insert settlement" />
-		<input id="charactersearch" placeholder="insert character" />
-	</div></p>
+	<h2>New Journal Entry</h2>
+	<p>Your journal is a place for you to write down your thoughts or record events from your view. It can also be used for other things, like as a repository of world information for your character's settings. Best of all, you can share these with others if you want, through the magic of the Lendan Stone network!</p>
+
+	<p>Be advsised that all content shared publicly MUST be safe for viewing for a teenager (13 years of age or older). Light swearing, is fine, but if you want to record your fantasies, make it private and/or graphic. Misuse of or failure to properly mark your journal entries may see all future entries forced to be marked private through GM action.</p>
 	{{ form(form) }}
-{% endblock %}
-{% block jquery %}
-
-{% include "element/msgautocomplete.js.twig" %}
-
-function search_insert(insert) {
-	var caretPos = document.getElementById("journal_entry").selectionStart;
-	var textAreaTxt = $("#journal_entry").val();
-	$("#journal_entry").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
-
-}
-
 {% endblock %}

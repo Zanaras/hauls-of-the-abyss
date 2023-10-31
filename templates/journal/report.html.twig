@@ -1,27 +1,11 @@
-{% extends "layout.html.twig" %}
+{% extends "base.html.twig" %}
 
 {% block content %}
-	<h2>{{ 'journal.report.header'|trans({}, "messages")|raw }}</h2>
-	<p>{{ 'journal.report.intro'|trans({}, "messages")|raw }}</p>
-	<p><div id="insertbox">
-		<input id="realmsearch" placeholder="insert realm" />
-		<input id="guildsearch" placeholder="insert association" />
-		<input id="housesearch" placeholder="insert house" />
-		<input id="placesearch" placeholder="insert place" />
-		<input id="settlementsearch" placeholder="insert settlement" />
-		<input id="charactersearch" placeholder="insert character" />
-	</div></p>
+	<h2>Report Journal Entry</h2>
+	<p>If there's something wrong or offensive in regards to this Journal, please let us know so we can look at it, by leaving some details below and hitting submit. Thank you!</p>
 	{{ form(form) }}
 {% endblock %}
 {% block jquery %}
 
-{% include "element/msgautocomplete.js.twig" %}
-
-function search_insert(insert) {
-	var caretPos = document.getElementById("userreport_text").selectionStart;
-	var textAreaTxt = $("#userreport_text").val();
-	$("#userreport_text").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
-
-}
 
 {% endblock %}

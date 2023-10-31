@@ -1,4 +1,4 @@
-{% extends "layout.html.twig" %}
+{% extends "base.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -6,12 +6,11 @@
 {% endblock %}
 
 {% block content %}
-<h2>{{ 'journal.mine.header2'|trans({'%name%': char.name}, "messages")|raw }}</h2>
+<h2>Their Journal Entries</h2>
 <table id="events"><thead>
 	<tr>
-		<th>{{ 'journal.mine.gamedate'|trans }}</th>
-		<th>{{ 'journal.mine.realdate'|trans }}</th>
-		<th>{{ 'journal.mine.topic'|trans }}</th>
+		<th>Date</th>
+		<th>Title</th>
 		<th></th>
 	</tr>
 </thead><tbody>
@@ -20,16 +19,15 @@
 	{% if not journal.isPrivate and not journal.isGraphic %}
 		{% set counter = counter + 1 %}
 		<tr>
-			<td>{{ journal.cycle|gametime("short") }}</td>
 			<td>{{ journal.date|date }}</td>
-			<td><a href="{{ path("maf_journal", {'id':journal.id}) }}">{{ journal.topic }}</a></td>
+			<td><a href="{{ path("journal_read", {'id':journal.id}) }}">{{ journal.topic }}</a></td>
 			<td>{# Remove, rewrite options go here, when we add them #}</td>
 		</tr>
 	{% endif %}
 {% endfor %}
 </tbody></table>
 {% if counter == 0 %}
-	<i>{{ 'journal.mine.nothinghere'|trans }}</i>
+	<i>It doesn't look like anything is here...</i>
 {% endif %}
 
 {% endblock %}
