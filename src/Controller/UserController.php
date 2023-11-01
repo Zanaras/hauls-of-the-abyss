@@ -173,7 +173,7 @@ class UserController extends AbstractController {
 
 	#[Route(path: '/characters', name: 'user_characters')]
 	public function characters(): Response {
-		$user = $this->app->security(AppState::USER, 'user_characters');
+		$user = $this->app->security('user_characters');
 		if ($user instanceof GuideKeeper) {
 			$this->addFlash('error', $this->trans->trans($user->getReason(), [], 'gatekeeper'));
 			return new RedirectResponse($user->getRoute());

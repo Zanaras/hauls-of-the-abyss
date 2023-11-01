@@ -130,7 +130,7 @@ class AppState {
 	 *
 	 * @return User|Character|GuideKeeper|null
 	 */
-	public function security(string $route, array $slugs = [], bool $override = false, bool $flush = true): User|Character|GuideKeeper|null {
+	public function security(string $route, array $slugs = [], bool $override = false, bool $flush = true): GuideKeeper|User|Character|null {
 		$user = $this->security->getUser();
 		/** @var User $user */
 		if ($this->security->isGranted('IS_AUTHENTICATED')) {
@@ -148,7 +148,7 @@ class AppState {
 			}
 			return $user;
 		}
-		return null;
+		return $user;
 	}
 
 	/**
