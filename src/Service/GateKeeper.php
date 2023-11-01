@@ -4,39 +4,39 @@ namespace App\Service;
 
 use App\Entity\Character;
 use App\Entity\GuideKeeper;
-use App\Entity\NetExit;
-use App\Entity\SecurityLog;
-use App\Entity\User;
-use App\Entity\UserLog;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * GateKeeper handles all in-character route user.
  * If Symfony firewall is Tier 1 of user, then AppState does Tier 2, and this does Tier 3.
  */
 class GateKeeper {
-
 	# Constants for Character AreaCodes.
 	const MU = AppState::MU;
 	const TOWN = AppState::TOWN;
 	const DUNGEON = AppState::DUNGEON;
 	const WILDS = AppState::WILDS;
-
 	private EntityManagerInterface $em;
-	private Security $security;
+	private AppState $app;
 
-	private bool $areaMatched = false;
-
-	public function __construct(AppState $app, EntityManagerInterface $em, Security $security) {
+	public function __construct(AppState $app, EntityManagerInterface $em) {
 		$this->app = $app;
 		$this->em = $em;
 	}
 
-	public function gateway(string $route, array $slugs = [], bool $flush = true) {
-		$char = $this->app->security('c', $route, $slugs, false, $flush);
+	/**
+	 * All routes that require a Character shoudl call this function and check if it returns an instance of a GudieKeeper object.
+	 * GuideKeepers have two properties, a route (getRoute) to redirect the user to, and an error (getReason) to throw as a translated flash.
+	 *
+	 * @param string $route REQUIRED: Route to check, used as a dynamic function call. A route_test function must exist in GateKeeper for each route that is tested.
+	 * @param array  $slugs OPTIONAL: Any slugs passed to the route, like a character ID or room ID. Pass in ['slug_use'=>'slug_provided']. For character IDs, an example: ['character'=>$character->getId()].
+	 * @param array  $objs  OPTIONAL: Any object that the route test requires to function properly, in order to save compute time not refetching something the Symfony Router has already populated.
+	 * @param bool   $flush OPTIONAL: Allows you to tell GateKeeper to not immediately flush user logs to the DB. Unless you know your route has to do something with the database immediately upon load by a user, leave this alone.
+	 *
+	 * @return GuideKeeper|Character
+	 */
+	public function gateway(string $route, array $slugs = [], array $objs = [], bool $flush = true): GuideKeeper|Character {
+		$char = $this->app->security($route, $slugs, false, $flush);
 		if ($char instanceof GuideKeeper) {
 			return $char;
 		}
@@ -48,11 +48,25 @@ class GateKeeper {
 		 * $this->{$route._'test'}($char, $route, $slugs) is a dynamic function call.
 		 * For example, if $route is "dungeon_move", then this would effectively be:
 		 * 	$this->dungeon_move_test($char, $route, $slugs);
+		 *
+		 * Related, yes, this means we will be commonly overloading functions, as *many* routes don't need slugs.
 		 */
-		return $this->{$route.'_test'}($char, $route, $slugs);
+		$test = $this->{$route . '_test'}($char, $route, $slugs);
+		if (array_key_exists('url', $test)) {
+			return $char;
+		} else {
+			return new GuideKeeper($this->findSafeRoute($char), $test['description']);
+		}
 	}
 
-	private function checkAreaCode(Character $char, $route) {
+	/**
+	 *
+	 * @param Character $char
+	 * @param           $route
+	 *
+	 * @return GuideKeeper|Character
+	 */
+	private function checkAreaCode(Character $char, $route): GuideKeeper|Character {
 		if (str_starts_with($route, 'town_')) {
 			$area = self::TOWN;
 		} elseif (str_starts_with($route, 'dungeon_')) {
@@ -63,7 +77,6 @@ class GateKeeper {
 			$area = self::MU;
 		}
 		if ($char->getAreaCode() === $area) {
-			$this->areaMatched = true;
 			return $char;
 		}
 		return $this->areaMismatch($char, $area);
@@ -83,25 +96,135 @@ class GateKeeper {
 		return new GuideKeeper($route, 'character.area.mismatch');
 	}
 
+	/**
+	 * Determine the safest route to redirect a user to based on what condition the user (or more accruately, their character) is in within the game.
+	 *
+	 * @param Character $char
+	 *
+	 * @return string
+	 */
+	private function findSafeRoute(Character $char): string {
+		/*
+		 * The argument could be made that MU should redirect to character start, but if we've ended up using this the user is trying to be somewhere they shouldn't be.
+		 * So we kick them back to a known safer spot, the user characters route, which resets their active character.
+		 */
+		return match ($char->getAreaCode()) {
+			self::DUNGEON => 'dungeon_status',
+			self::TOWN => 'town_status',
+			self::WILDS => 'wilds_status',
+			self::MU => 'user_characters',
+		};
+	}
+
+	/**
+	 * Build test pass array from inputs.
+	 *
+	 * @param string $title
+	 * @param string $route
+	 *
+	 * @return string[]
+	 */
+	private function pass(string $title, string $route): array {
+		return [
+			'title' => $title,
+			'url' => $route,
+		];
+	}
+
+	/**
+	 * Build test fail array from inputs.
+	 *
+	 * @param string $title
+	 * @param string $error
+	 *
+	 * @return string[]
+	 */
+	private function fail(string $title, string $error): array {
+		return [
+			'title' => $title,
+			'description' => $error,
+		];
+	}
+
 	/*
 	 * Navigation Menu Functions
 	 */
 
-	public function townNav(Character $char, array $opts = []) {
-
+	public function townNav(Character $char, array $opts = []): array {
+		$options = [];
+		$options[] = $this->town_status_test($char);
+		$options[] = $this->town_to_dungeon_test($char);
+		return $options;
 	}
 
-	public function dungeonNav(Character $char, array $opts = []) {
-
+	public function dungeonNav(Character $char, array $opts = []): array {
+		$options = [];
+		return $options;
 	}
 
-	public function wildsNav(Character $char, array $opts = []) {
-
+	public function wildsNav(Character $char, array $opts = []): array {
+		$options = [];
+		return $options;
 	}
 
 	/*
 	 * Route Security Checks
+	 *
+	 * These exist both to check that we're allowed to be at this route by checking things that would fail us from being here.
+	 * If you want to condense or group multiple checks across many, turn them into a function, and then have that function return false if they can be there, and a string'd error code if they can't.
 	 */
 
+	/**
+	 * Route security for "dungeon_status".
+	 * @param Character $char
+	 * @param string    $route
+	 *
+	 * @return string[]
+	 */
+	private function dungeon_status_test(Character $char, string $route = 'dungeon_status'): array {
+		$title = 'Enter the Abyss';
+		if ($char->getAreaCode() === self::MU) {
+			return $this->fail($title, 'generic.notstarted');
+		}
+		if ($char->getAreaCode() !== self::DUNGEON) {
+			return $this->fail($title, 'generic.notindungeon');
+		}
+		return $this->pass($title, $route);
+	}
 
+	/**
+	 * Route security check for "town_status".
+	 * @param Character $char
+	 * @param string    $route
+	 *
+	 * @return string[]
+	 */
+	private function town_status_test(Character $char, string $route = 'town_status'): array {
+		$title = 'Go To Town';
+		if ($char->getAreaCode() === self::MU) {
+			return $this->fail($title, 'generic.notstarted');
+		}
+		if ($char->getAreaCode() === self::DUNGEON) {
+			return $this->fail($title, 'generic.indungeon');
+		}
+		return $this->pass($title, $route);
+	}
+
+	/**
+	 * Route security check for "town_to_dungeon".
+	 * @param Character $char
+	 * @param string    $route
+	 *
+	 * @return string[]
+	 */
+	private function town_to_dungeon_test(Character $char, string $route = 'town_to_dungeon'): array {
+		$title = 'Enter the Abyss';
+		if ($char->getAreaCode() === self::MU) {
+			return $this->fail($title, 'generic.notstarted');
+		}
+		if ($char->getAreaCode() === self::DUNGEON) {
+			return $this->fail($title, 'generic.indungeon');
+		}
+		return $this->pass($title, $route);
+	}
 }

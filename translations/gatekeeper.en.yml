@@ -3,6 +3,9 @@
 # Author: Andrew Gwynn
 # Contact: hotateam@lemuriacommunity.org
 
+generic:
+  indungeon: You must safely exit the dungeon before atttempting to travel beyond it.
+
 user:
   character:
     dead: The character your attempting to play appears to be dead.
