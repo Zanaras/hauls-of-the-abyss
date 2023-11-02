@@ -2,40 +2,32 @@
 
 namespace App\Entity;
 
-class TransitType
-{
-    private ?string $name = null;
+class TransitType {
+	private ?string $name = null;
+	private array $modifiers = [];
+	private ?int $id = null;
 
-    private array $modifiers = [];
+	public function getName(): ?string {
+		return $this->name;
+	}
 
-    private ?int $id = null;
+	public function setName(string $name): static {
+		$this->name = $name;
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
+		return $this;
+	}
 
-    public function setName(string $name): static
-    {
-        $this->name = $name;
+	public function getModifiers(): array {
+		return $this->modifiers;
+	}
 
-        return $this;
-    }
+	public function setModifiers(array $modifiers): static {
+		$this->modifiers = $modifiers;
 
-    public function getModifiers(): array
-    {
-        return $this->modifiers;
-    }
+		return $this;
+	}
 
-    public function setModifiers(array $modifiers): static
-    {
-        $this->modifiers = $modifiers;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+	public function getId(): ?int {
+		return $this->id;
+	}
 }

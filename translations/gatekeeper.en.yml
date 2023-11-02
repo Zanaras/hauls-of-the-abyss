@@ -3,8 +3,14 @@
 # Author: Andrew Gwynn
 # Contact: hotateam@lemuriacommunity.org
 
+dungeon:
+  notexploring: You are not yet inside the dungeon.
+  nolastroom: There is no previous room.
+  notretunpath: Your path here was one-way.
+
 generic:
   indungeon: You must safely exit the dungeon before atttempting to travel beyond it.
+  nostarted: You must complete character generation with this character before you can do that.
 
 user:
   character:

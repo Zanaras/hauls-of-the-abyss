@@ -22,6 +22,7 @@ class TownController extends AbstractController {
 		$this->gk = $gk;
 		$this->trans = $trans;
 	}
+
 	#[Route('/town', name: 'town_status')]
 	public function index(): RedirectResponse|Response {
 		$char = $this->gk->gateway('town_status');

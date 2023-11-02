@@ -14,6 +14,8 @@
 		<field name="slumbering" type="boolean"/>
 		<field name="special" type="boolean"/>
 		<field name="wounded" type="smallint"/>
+		<field name="energy" type="float"/>
+		<field name="maxEnergy" type="float"/>
 		<field name="areaCode" type="smallint"/>
 		<field name="gender" type="string" length="1"/>
 
@@ -30,6 +32,8 @@
 			</order-by>
 		</one-to-many>
 		<many-to-one field="room" target-entity="Room" inversed-by="characters"/>
+		<many-to-one field="lastRoom" target-entity="Room"/>
+		<one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
 
 
 		<!--
@@ -42,7 +46,6 @@
 		<one-to-many field="messages" target-entity="Message" mapped-by="sender" fetch="EXTRA_LAZY"/>
 		<one-to-many field="tagged_messages" target-entity="MessageTag" mapped-by="character" fetch="EXTRA_LAZY"/>
 
-		<one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
 		<one-to-many field="created_styles" target-entity="Style" mapped-by="creator"/>
 		-->
 	</entity>

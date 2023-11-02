@@ -5,77 +5,64 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class Dungeon
-{
-    private ?string $type = null;
+class Dungeon {
+	private ?string $type = null;
+	private ?string $name = null;
+	private ?int $id = null;
+	private Collection $rooms;
 
-    private ?string $name = null;
+	public function __construct() {
+		$this->rooms = new ArrayCollection();
+	}
 
-    private ?int $id = null;
+	public function getType(): ?string {
+		return $this->type;
+	}
 
-    private Collection $rooms;
+	public function setType(string $type): static {
+		$this->type = $type;
 
-    public function __construct()
-    {
-        $this->rooms = new ArrayCollection();
-    }
+		return $this;
+	}
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
+	public function getName(): ?string {
+		return $this->name;
+	}
 
-    public function setType(string $type): static
-    {
-        $this->type = $type;
+	public function setName(string $name): static {
+		$this->name = $name;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
+	public function getId(): ?int {
+		return $this->id;
+	}
 
-    public function setName(string $name): static
-    {
-        $this->name = $name;
+	/**
+	 * @return Collection<int, Room>
+	 */
+	public function getRooms(): Collection {
+		return $this->rooms;
+	}
 
-        return $this;
-    }
+	public function addRoom(Room $room): static {
+		if (!$this->rooms->contains($room)) {
+			$this->rooms->add($room);
+			$room->setDungeon($this);
+		}
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+		return $this;
+	}
 
-    /**
-     * @return Collection<int, Room>
-     */
-    public function getRooms(): Collection
-    {
-        return $this->rooms;
-    }
+	public function removeRoom(Room $room): static {
+		if ($this->rooms->removeElement($room)) {
+			// set the owning side to null (unless already changed)
+			if ($room->getDungeon() === $this) {
+				$room->setDungeon(null);
+			}
+		}
 
-    public function addRoom(Room $room): static
-    {
-        if (!$this->rooms->contains($room)) {
-            $this->rooms->add($room);
-            $room->setDungeon($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRoom(Room $room): static
-    {
-        if ($this->rooms->removeElement($room)) {
-            // set the owning side to null (unless already changed)
-            if ($room->getDungeon() === $this) {
-                $room->setDungeon(null);
-            }
-        }
-
-        return $this;
-    }
+		return $this;
+	}
 }

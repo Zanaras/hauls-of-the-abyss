@@ -16,12 +16,10 @@ class GateKeeper {
 	const TOWN = AppState::TOWN;
 	const DUNGEON = AppState::DUNGEON;
 	const WILDS = AppState::WILDS;
-	private EntityManagerInterface $em;
 	private AppState $app;
 
-	public function __construct(AppState $app, EntityManagerInterface $em) {
+	public function __construct(AppState $app) {
 		$this->app = $app;
-		$this->em = $em;
 	}
 
 	/**
@@ -30,12 +28,12 @@ class GateKeeper {
 	 *
 	 * @param string $route REQUIRED: Route to check, used as a dynamic function call. A route_test function must exist in GateKeeper for each route that is tested.
 	 * @param array  $slugs OPTIONAL: Any slugs passed to the route, like a character ID or room ID. Pass in ['slug_use'=>'slug_provided']. For character IDs, an example: ['character'=>$character->getId()].
-	 * @param array  $objs  OPTIONAL: Any object that the route test requires to function properly, in order to save compute time not refetching something the Symfony Router has already populated.
+	 * @param array  $opts  OPTIONAL: Any flags you want to pass, like objects that Symfony's Router has already loaded or a key to tell the gateway to return an array instead of a Character.
 	 * @param bool   $flush OPTIONAL: Allows you to tell GateKeeper to not immediately flush user logs to the DB. Unless you know your route has to do something with the database immediately upon load by a user, leave this alone.
 	 *
 	 * @return GuideKeeper|Character
 	 */
-	public function gateway(string $route, array $slugs = [], array $objs = [], bool $flush = true): GuideKeeper|Character {
+	public function gateway(string $route, array $slugs = [], array $opts = ['list'=>true], bool $flush = true): GuideKeeper|Character {
 		$char = $this->app->security($route, $slugs, false, $flush);
 		if ($char instanceof GuideKeeper) {
 			return $char;
@@ -51,8 +49,10 @@ class GateKeeper {
 		 *
 		 * Related, yes, this means we will be commonly overloading functions, as *many* routes don't need slugs.
 		 */
-		$test = $this->{$route . '_test'}($char, $route, $slugs);
-		if (array_key_exists('url', $test)) {
+		$test = $this->{$route . '_test'}($char, $route, $opts);
+		if (array_key_exists('list', $test)) {
+			return $test['list'];
+		} elseif (array_key_exists('url', $test)) {
 			return $char;
 		} else {
 			return new GuideKeeper($this->findSafeRoute($char), $test['description']);
@@ -190,6 +190,33 @@ class GateKeeper {
 			return $this->fail($title, 'generic.notindungeon');
 		}
 		return $this->pass($title, $route);
+	}
+
+
+	private function dungeon_retreat_test(Character $char, string $route = 'dungeon_status', $opts = ['list'=>false]): array {
+		$title = 'Retreat from the Room';
+		if ($char->getAreaCode() === self::MU) {
+			return $this->fail($title, 'generic.notstarted');
+		}
+		if ($char->getAreaCode() !== self::DUNGEON) {
+			return $this->fail($title, 'generic.notindungeon');
+		}
+		$room = $char->getRoom();
+		if (!$room) {
+			return $this->fail($title, 'dungeon.notexploring');
+		}
+		$last = $char->getLastRoom();
+		if (!$last) {
+			return $this->fail($title, 'dungeon.nolastroom');
+		}
+		foreach ($room->getExits() as $each) {
+			if ($each->getToRoom() === $last) {
+				$return = $this->pass($title, 'dungeon_retreat');
+				$return['list'] = [$char, $each];
+				return $return;
+			}
+		}
+		return $this->fail($title, 'dungeon.noreturnpath');
 	}
 
 	/**

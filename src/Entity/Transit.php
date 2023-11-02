@@ -2,82 +2,65 @@
 
 namespace App\Entity;
 
-class Transit
-{
-    private ?string $transits = null;
+class Transit {
+	private ?string $transits = null;
+	private ?int $id = null;
+	private ?Dungeon $dungeon = null;
+	private ?TransitType $type = null;
+	private ?Room $fromRoom = null;
+	private ?Room $toRoom = null;
 
-    private ?int $id = null;
+	public function getTransits(): ?string {
+		return $this->transits;
+	}
 
-    private ?Dungeon $dungeon = null;
+	public function setTransits(string $transits): static {
+		$this->transits = $transits;
 
-    private ?TransitType $type = null;
+		return $this;
+	}
 
-    private ?Room $fromRoom = null;
+	public function getId(): ?int {
+		return $this->id;
+	}
 
-    private ?Room $toRoom = null;
+	public function getDungeon(): ?Dungeon {
+		return $this->dungeon;
+	}
 
-    public function getTransits(): ?string
-    {
-        return $this->transits;
-    }
+	public function setDungeon(?Dungeon $dungeon): static {
+		$this->dungeon = $dungeon;
 
-    public function setTransits(string $transits): static
-    {
-        $this->transits = $transits;
+		return $this;
+	}
 
-        return $this;
-    }
+	public function getType(): ?TransitType {
+		return $this->type;
+	}
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+	public function setType(?TransitType $type): static {
+		$this->type = $type;
 
-    public function getDungeon(): ?Dungeon
-    {
-        return $this->dungeon;
-    }
+		return $this;
+	}
 
-    public function setDungeon(?Dungeon $dungeon): static
-    {
-        $this->dungeon = $dungeon;
+	public function getFromRoom(): ?Room {
+		return $this->fromRoom;
+	}
 
-        return $this;
-    }
+	public function setFromRoom(?Room $fromRoom): static {
+		$this->fromRoom = $fromRoom;
 
-    public function getType(): ?TransitType
-    {
-        return $this->type;
-    }
+		return $this;
+	}
 
-    public function setType(?TransitType $type): static
-    {
-        $this->type = $type;
+	public function getToRoom(): ?Room {
+		return $this->toRoom;
+	}
 
-        return $this;
-    }
+	public function setToRoom(?Room $toRoom): static {
+		$this->toRoom = $toRoom;
 
-    public function getFromRoom(): ?Room
-    {
-        return $this->fromRoom;
-    }
-
-    public function setFromRoom(?Room $fromRoom): static
-    {
-        $this->fromRoom = $fromRoom;
-
-        return $this;
-    }
-
-    public function getToRoom(): ?Room
-    {
-        return $this->toRoom;
-    }
-
-    public function setToRoom(?Room $toRoom): static
-    {
-        $this->toRoom = $toRoom;
-
-        return $this;
-    }
+		return $this;
+	}
 }
