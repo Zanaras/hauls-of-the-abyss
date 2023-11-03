@@ -9,6 +9,7 @@
 
 		<field name="name" type="string" nullable="true"/>
 		<field name="playerKills" type="integer"/>
+		<field name="health" type="float"/>
 		<field name="size" type="string"/>
 		<field name="constitution" type="float"/>
 		<field name="spirit" type="float"/>

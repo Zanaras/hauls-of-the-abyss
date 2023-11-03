@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Character;
+use App\Entity\Monster;
 use App\Entity\Dungeon;
 use App\Entity\Journal;
 use App\Entity\Room;
@@ -238,9 +239,48 @@ class DungeonMaster {
 		throw new \LogicException("Unknown room requested in DungeonMaster->findRoomTypeNamed!");
 	}
 
-	public function characterAttackMob(Character $char, $target) {
+	public function characterAttackMob(Character $char, Monster $target) : void {
 		#TODO: Logic n stuff.
+        # roll for hit on mob
+        # if success && mob == neutral
+        # then set room agro (??)
+        # if success, roll for DMG
+        # set rolled DMG multiplier(???)
+        # calculate damage based on player stats
+        #
+        # apply DMG to Mob (account for resistances?)
+        # if Mob health < 0
+        # set Mob = dead
+        #
 	}
+
+    public function mobAttackCharacter(Monster $mob, Character $target) : void {
+        #TODO: implement logic
+        # roll for hit on player
+        #
+        # if success, roll for DMG
+        # set multiplier(???)
+        # calculate damage based on mob stats
+        #
+        # apply DMG to character (account for resistances?)
+        # if Player health < 0
+        # kill/respawn player(???)
+        # kick out of dungoen(???)
+        # ?????????
+    }
+
+    public function spawnMob(int $depth, string $mobType) : Monster {
+        $monster = new Monster;
+        #
+        #TODO: logic
+        #
+        #if $mobType == null or empty
+        #roll for random mob
+        #
+        #calculate and set mob health
+        #
+        return $monster;
+    }
 
 	public function calculateEnergyCost(Character $char, string $action) {
 		switch ($action) {
