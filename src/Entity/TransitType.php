@@ -2,32 +2,34 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
+
 class TransitType {
 	private ?string $name = null;
 	private array $modifiers = [];
 	private ?int $id = null;
 
 	public function getName(): ?string {
-		return $this->name;
-	}
+   		return $this->name;
+   	}
 
 	public function setName(string $name): static {
-		$this->name = $name;
-
-		return $this;
-	}
+   		$this->name = $name;
+   
+   		return $this;
+   	}
 
 	public function getModifiers(): array {
-		return $this->modifiers;
-	}
+   		return $this->modifiers;
+   	}
 
 	public function setModifiers(array $modifiers): static {
-		$this->modifiers = $modifiers;
-
-		return $this;
-	}
+   		$this->modifiers = $modifiers;
+   
+   		return $this;
+   	}
 
 	public function getId(): ?int {
-		return $this->id;
-	}
+   		return $this->id;
+   	}
 }

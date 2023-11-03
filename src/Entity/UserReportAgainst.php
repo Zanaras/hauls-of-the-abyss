@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
+
 class UserReportAgainst {
 	private ?\DateTimeInterface $date = null;
 	private ?string $id = null;
@@ -10,46 +12,46 @@ class UserReportAgainst {
 	private ?UserReport $report = null;
 
 	public function getDate(): ?\DateTimeInterface {
-		return $this->date;
-	}
+   		return $this->date;
+   	}
 
 	public function setDate(\DateTimeInterface $date): static {
-		$this->date = $date;
-
-		return $this;
-	}
+   		$this->date = $date;
+   
+   		return $this;
+   	}
 
 	public function getId(): ?string {
-		return $this->id;
-	}
+   		return $this->id;
+   	}
 
 	public function getAddedBy(): ?User {
-		return $this->added_by;
-	}
+   		return $this->added_by;
+   	}
 
 	public function setAddedBy(?User $added_by): static {
-		$this->added_by = $added_by;
-
-		return $this;
-	}
+   		$this->added_by = $added_by;
+   
+   		return $this;
+   	}
 
 	public function getUser(): ?User {
-		return $this->user;
-	}
+   		return $this->user;
+   	}
 
 	public function setUser(?User $user): static {
-		$this->user = $user;
-
-		return $this;
-	}
+   		$this->user = $user;
+   
+   		return $this;
+   	}
 
 	public function getReport(): ?UserReport {
-		return $this->report;
-	}
+   		return $this->report;
+   	}
 
 	public function setReport(?UserReport $report): static {
-		$this->report = $report;
-
-		return $this;
-	}
+   		$this->report = $report;
+   
+   		return $this;
+   	}
 }

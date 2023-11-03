@@ -9,3 +9,6 @@
 /vendor/
 /.idea/
 ###< symfony/framework-bundle ###
+
+.phpactor.json
+

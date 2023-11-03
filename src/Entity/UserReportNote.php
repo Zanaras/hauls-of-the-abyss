@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
+
 class UserReportNote {
 	private ?string $text = null;
 	private ?\DateTimeInterface $date = null;
@@ -12,66 +14,66 @@ class UserReportNote {
 	private ?UserReport $report = null;
 
 	public function getText(): ?string {
-		return $this->text;
-	}
+   		return $this->text;
+   	}
 
 	public function setText(string $text): static {
-		$this->text = $text;
-
-		return $this;
-	}
+   		$this->text = $text;
+   
+   		return $this;
+   	}
 
 	public function getDate(): ?\DateTimeInterface {
-		return $this->date;
-	}
+   		return $this->date;
+   	}
 
 	public function setDate(\DateTimeInterface $date): static {
-		$this->date = $date;
-
-		return $this;
-	}
+   		$this->date = $date;
+   
+   		return $this;
+   	}
 
 	public function isPending(): ?bool {
-		return $this->pending;
-	}
+   		return $this->pending;
+   	}
 
 	public function setPending(bool $pending): static {
-		$this->pending = $pending;
-
-		return $this;
-	}
+   		$this->pending = $pending;
+   
+   		return $this;
+   	}
 
 	public function getVerdict(): ?string {
-		return $this->verdict;
-	}
+   		return $this->verdict;
+   	}
 
 	public function setVerdict(string $verdict): static {
-		$this->verdict = $verdict;
-
-		return $this;
-	}
+   		$this->verdict = $verdict;
+   
+   		return $this;
+   	}
 
 	public function getId(): ?string {
-		return $this->id;
-	}
+   		return $this->id;
+   	}
 
 	public function getFrom(): ?User {
-		return $this->from;
-	}
+   		return $this->from;
+   	}
 
 	public function setFrom(?User $from): static {
-		$this->from = $from;
-
-		return $this;
-	}
+   		$this->from = $from;
+   
+   		return $this;
+   	}
 
 	public function getReport(): ?UserReport {
-		return $this->report;
-	}
+   		return $this->report;
+   	}
 
 	public function setReport(?UserReport $report): static {
-		$this->report = $report;
-
-		return $this;
-	}
+   		$this->report = $report;
+   
+   		return $this;
+   	}
 }

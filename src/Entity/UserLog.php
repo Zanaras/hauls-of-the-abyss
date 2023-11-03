@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 
 class UserLog {
 	private ?DateTimeInterface $ts = null;
@@ -15,76 +16,76 @@ class UserLog {
 	private ?Character $character = null;
 
 	public function getTs(): ?DateTimeInterface {
-		return $this->ts;
-	}
+   		return $this->ts;
+   	}
 
 	public function setTs(DateTimeInterface $ts): static {
-		$this->ts = $ts;
-
-		return $this;
-	}
+   		$this->ts = $ts;
+   
+   		return $this;
+   	}
 
 	public function getIp(): ?string {
-		return $this->ip;
-	}
+   		return $this->ip;
+   	}
 
 	public function setIp(string $ip): static {
-		$this->ip = $ip;
-
-		return $this;
-	}
+   		$this->ip = $ip;
+   
+   		return $this;
+   	}
 
 	public function getRoute(): ?string {
-		return $this->route;
-	}
+   		return $this->route;
+   	}
 
 	public function setRoute(string $route): static {
-		$this->route = $route;
-
-		return $this;
-	}
+   		$this->route = $route;
+   
+   		return $this;
+   	}
 
 	public function getAgent(): ?string {
-		return $this->agent;
-	}
+   		return $this->agent;
+   	}
 
 	public function setAgent(string $agent): static {
-		$this->agent = $agent;
-
-		return $this;
-	}
+   		$this->agent = $agent;
+   
+   		return $this;
+   	}
 
 	public function getId(): ?int {
-		return $this->id;
-	}
+   		return $this->id;
+   	}
 
 	public function getUser(): ?User {
-		return $this->user;
-	}
+   		return $this->user;
+   	}
 
 	public function setUser(?User $user): static {
-		$this->user = $user;
-
-		return $this;
-	}
+   		$this->user = $user;
+   
+   		return $this;
+   	}
 
 	public function getSlugs(): ?string {
-		return $this->slugs;
-	}
+   		return $this->slugs;
+   	}
 
 	public function setSlugs(string $slugs): static {
-		$this->slugs = $slugs;
-
-		return $this;
-	}
+   		$this->slugs = $slugs;
+   
+   		return $this;
+   	}
 
 	public function getCharacter(): ?Character {
-		return $this->character;
-	}
+   		return $this->character;
+   	}
 
 	public function setCharacter(?Character $character): static {
-		$this->character = $character;
-
-		return $this;
-	}
+   		$this->character = $character;
+   
+   		return $this;
+   	}
 }
