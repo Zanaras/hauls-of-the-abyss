@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\Room">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="character" target-entity="Character" invsered-by="teleporters"/>
+		<many-to-one field="room" target-entity="Room"/>
+
+	</entity>
+</doctrine-mapping>

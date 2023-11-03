@@ -5,7 +5,13 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<field name="spawn" type="boolean"/>
+		<field name="teleporter" type="boolean"/>
+		<field name="portal" type="boolean"/>
+		<field name="allowUp" type="boolean"/>
+		<field name="allowDown" type="boolean"/>
 		<field name="modifiers" type="array"/>
+		<field name="alternate" type="string" nullable="true"/>
 
 	</entity>
 </doctrine-mapping>

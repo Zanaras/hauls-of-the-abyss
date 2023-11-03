@@ -31,9 +31,11 @@
 				<order-by-field name="date" direction="DESC"/>
 			</order-by>
 		</one-to-many>
+		<many-to-one field="dungeon" target-entity="Dungeon" inversed-by="characters"/>
 		<many-to-one field="room" target-entity="Room" inversed-by="characters"/>
 		<many-to-one field="lastRoom" target-entity="Room"/>
 		<one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
+		<one-to-many field="teleporters" target-entity="CharacterTeleporter" mapped-by="character" fetch="EXTRA_LAZY"/>
 
 
 		<!--

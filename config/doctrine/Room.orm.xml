@@ -5,12 +5,19 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<many-to-one field="dungeon" target-entity="Dungeon" inversed-by="rooms"/>
+		<many-to-one field="floor" target-entity="Floor" inversed-by="rooms"/>
 		<many-to-one field="type" target-entity="RoomType"/>
+		<many-to-one field="altType" target-entity="RoomType"/>
 		<one-to-many field="characters" target-entity="Character" mapped-by="room"/>
 		<one-to-many field="exits" target-entity="Transit" mapped-by="toRoom"/>
 		<one-to-many field="entrances" target-entity="Transit" mapped-by="fromRoom"/>
+		<many-to-one field="leavesFloor" target-entity="Floor" inversed-by="exits"/>
+		<many-to-one field="entersFloor" target-entity="Floor" inversed-by="entrances"/>
 
 		<field name="visits" type="bigint"/>
+		<field name="dungeonExit" type="boolean"/>
+		<field name="modifiers" type="array" nullable="true"/>
+		<field name="pathRoll" type="integer"/>
 
 	</entity>
 </doctrine-mapping>

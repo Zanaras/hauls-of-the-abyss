@@ -7,6 +7,8 @@
 		<field name="type" type="string"/>
 		<field name="name" type="string"/>
 		<one-to-many field="rooms" target-entity="Room" mapped-by="dungeon"/>
+		<one-to-many field="characters" target-entity="Character" mapped-by="dungeon" fetch="EXTRA_LAZY"/>
+		<one-to-many field="floors" target-entity="Floor" mapped-by="dungeon"/>
 
 	</entity>
 </doctrine-mapping>
