@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\MonsterType">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<field name="name" type="string"/>
+		<field name="size" type="string"/>
+        <field name="image" type="string" />
+		<field name="attackType" type="array"/>
+
+	</entity>
+</doctrine-mapping>

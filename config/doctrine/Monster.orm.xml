@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="App\Entity\Monster">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+        <many-to-one field="type" target-entity="MonsterType" />
+
+		<field name="name" type="string" nullable="true"/>
+		<field name="playerKills" type="integer"/>
+		<field name="size" type="string"/>
+		<field name="constitution" type="float"/>
+		<field name="spirit" type="float"/>
+
+	</entity>
+</doctrine-mapping>
