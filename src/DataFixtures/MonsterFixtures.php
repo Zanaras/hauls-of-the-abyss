@@ -12,14 +12,27 @@ class MonsterFixtures extends Fixture {
 		'slime' => [
 			'size' => 'medium',
             'image' => '../images/slime.png',
+            'imageDead' => '../images/slimeDead.png',
+            'neutral' => true,
             'attackType' => [
                 'physical',
                 'magic'
             ],
 		],
+		'mimic' => [
+			'size' => 'medium',
+            'image' => '../images/mimic.png',
+            'imageDead' => '../images/mimicDead.png',
+            'neutral' => true,
+            'attackType' => [
+                'physical',
+            ],
+		],
         'skeleton' => [
             'size' => 'medium',
             'image' => '../images/skeleton.png',
+            'imageDead' => '../images/skeletonDead.png',
+            'neutral' => false,
             'attackType' => [
                 'physical',
             ],
@@ -27,6 +40,8 @@ class MonsterFixtures extends Fixture {
 		'goblin' => [
 			'size' => 'small',
             'image' => '../images/goblin.png',
+            'imageDead' => '../images/goblinDead.png',
+            'neutral' => false,
             'attackType' => [
                 'physical',
             ],
@@ -34,6 +49,8 @@ class MonsterFixtures extends Fixture {
 		'imp' => [
 			'size' => 'small',
             'image' => '../images/imp.png',
+            'imageDead' => '../images/impDead.png',
+            'neutral' => false,
             'attackType' => [
                 'magic',
             ],
@@ -52,6 +69,8 @@ class MonsterFixtures extends Fixture {
 			}
 			$monster->setSize($data['size']);
 			$monster->setImage($data['image']);
+			$monster->setImageDead($data['imageDead']);
+			$monster->setNeutral($data['neutral']);
 			$monster->setAttackTypes($data['attackType']);
 		}
 

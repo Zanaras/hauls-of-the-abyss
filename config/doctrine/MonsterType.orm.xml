@@ -7,7 +7,10 @@
 
 		<field name="name" type="string"/>
 		<field name="size" type="string"/>
+		<field name="neutral" type="boolean"/>
+		<field name="alive" type="boolean"/>
         <field name="image" type="string" />
+        <field name="imageDead" type="string" />
 		<field name="attackType" type="array"/>
 
 	</entity>

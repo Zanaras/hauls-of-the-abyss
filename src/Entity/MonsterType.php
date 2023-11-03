@@ -2,15 +2,19 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
-
 class MonsterType
 {
     private ?string $name = null;
 
     private ?string $size = null;
 
+    private ?bool $neutral = null;
+
+    private ?bool $alive = null;
+
     private ?string $image = null;
+
+    private ?string $imageDead = null;
 
     private array $attackType = [];
 
@@ -40,6 +44,30 @@ class MonsterType
         return $this;
     }
 
+    public function isNeutral(): ?bool
+    {
+        return $this->neutral;
+    }
+
+    public function setNeutral(bool $neutral): static
+    {
+        $this->neutral = $neutral;
+
+        return $this;
+    }
+
+    public function isAlive(): ?bool
+    {
+        return $this->alive;
+    }
+
+    public function setAlive(bool $alive): static
+    {
+        $this->alive = $alive;
+
+        return $this;
+    }
+
     public function getImage(): ?string
     {
         return $this->image;
@@ -48,6 +76,18 @@ class MonsterType
     public function setImage(string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getImageDead(): ?string
+    {
+        return $this->imageDead;
+    }
+
+    public function setImageDead(string $imageDead): static
+    {
+        $this->imageDead = $imageDead;
 
         return $this;
     }
