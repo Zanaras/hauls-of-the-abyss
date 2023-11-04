@@ -13,7 +13,7 @@
 
         <one-to-one field="previous" target-entity="Description" inversed-by="next"/>
         <one-to-one field="next" target-entity="Description" mapped-by="previous"/>
-        <many-to-one field="updater" target-entity="Character" inversed-by="updated_descriptions"/>
+        <many-to-one field="updater" target-entity="Character" inversed-by="updatedDescriptions"/>
         <field name="ts" type="datetime"/>
         <field name="cycle" type="integer"/>
 

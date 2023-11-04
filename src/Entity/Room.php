@@ -21,14 +21,16 @@ class Room {
 	private ?RoomType $altType = null;
 	private ?Floor $leavesToFloor = null;
 	private ?Floor $entersToFloor = null;
+	private Collection $monsters;
 
 	public function __construct() {
 		$this->characters = new ArrayCollection();
 		$this->exits = new ArrayCollection();
 		$this->entrances = new ArrayCollection();
+		$this->monsters = new ArrayCollection();
 	}
 
-	public function findAvailableDirection() {
+	public function findAvailableDirection(): string|false {
 		$all = [
 			1 => "N",
 			2 => "NE",
@@ -40,10 +42,25 @@ class Room {
 			8 => "NW",
 		];
 		$max = 8;
-		foreach ($this->exits as $transits) {
-			unset($a)
+		foreach ($this->exits as $transit) {
+			foreach ($all as $key=>$opt) {
+				# Check if this transit's direction exists in the array above, remove it if it does.
+				if (in_array($transit>getDirection(), $all)) {
+					unset($all[$key]);
+					$max--;
+					break; # Return to outer loop.
+				}
+			}
 		}
-
+		if ($max !== 1) {
+			# More than one left, return one at random.
+			return rand(1, $max);
+		} elseif ($max === 1) {
+			# Only one left, just return it.
+			return $all[array_key_last($all)];
+		}
+		# Shouldn't happen, but just in case.
+		return false;
 	}
 
 	public function getVisits(): ?string {
@@ -135,6 +152,33 @@ class Room {
 			// set the owning side to null (unless already changed)
 			if ($entrance->getFromRoom() === $this) {
 				$entrance->setFromRoom(null);
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @return Collection<int, Monster>
+	 */
+	public function getMonsters(): Collection {
+		return $this->monsters;
+	}
+
+	public function addMonster(Monster $monster): static {
+		if (!$this->monsters->contains($monster)) {
+			$this->monsters->add($monster);
+			$monster->setRoom($this);
+		}
+
+		return $this;
+	}
+
+	public function removeMonster(Monster $monster): static {
+		if ($this->monsters->removeElement($monster)) {
+			// set the owning side to null (unless already changed)
+			if ($monster->getRoom() === $this) {
+				$monster->setRoom(null);
 			}
 		}
 

@@ -244,7 +244,7 @@ class Architect {
 	}
 
 	public function rollPath(array $chances): int {
-		$roll = rand(1,$chances[-1]);
+		$roll = rand(1,$chances[array_key_last($chances)]);
 		foreach ($chances as $count=> $chance) {
 			if ($chance <= $roll) {
 				return $count;
@@ -274,7 +274,7 @@ class Architect {
 			# Floor starter or ender!
 			return $this->findRoomTypeNamed('stairs');
 		}
-		$roll = rand(1,self::ROOMCHANCES[-1]);
+		$roll = rand(1,self::ROOMCHANCES[array_key_last(self::ROOMCHANCES)]);
 		$max = count(self::ROOMCHANCES);
 
 		$result = false;
@@ -286,7 +286,7 @@ class Architect {
 					throw new LogicException("Unable to pickRoomType, never finding valid pick!");
 				}
 				# Something weird is going on. Re-roll.
-				$roll = rand(1,self::ROOMCHANCES[-1]);
+				$roll = rand(1,self::ROOMCHANCES[array_key_last(self::ROOMCHANCES)]);
 				$rerolls++;
 				$rounds = 1;
 			}

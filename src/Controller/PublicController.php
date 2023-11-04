@@ -27,7 +27,7 @@ class PublicController extends AbstractController {
 		$update = $em->createQuery('SELECT u from App:UpdateNote u ORDER BY u.id DESC')->setMaxResults(1)->getResult();
 		return $this->render('public/index.html.twig', [
 			'controller_name' => 'PublicController',
-			'form' => $form->createView(),
+			'form' => $form?->createView(),
 			'journals' => $journals,
 			'update' => $update,
 		]);

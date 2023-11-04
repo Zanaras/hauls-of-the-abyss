@@ -238,10 +238,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
    		return $this->watched;
    	}
 
-	public function isBypassExitCheck(): ?bool {
-   		return $this->bypassExitCheck;
-   	}
-
 	public function getLanguage(): ?string {
    		return $this->language;
    	}
