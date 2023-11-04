@@ -272,7 +272,7 @@ class AppState {
 	 * @return bool
 	 */
 	public function exitsCheck($user): bool {
-		if ($user->getBypassExits()) {
+		if ($user->getBypassExitCheck()) {
 			# Trusted user. Check bypassed.
 			return false;
 		}

@@ -69,7 +69,7 @@ class UserController extends AbstractController {
 			// generate a signed url and email it to the user
 			#TODO: Run this through the tranlsator system.
 			$this->emailVerifier->sendEmailConfirmation(
-				'app_verify_email',
+				'user_verify_email',
 				$user, (new TemplatedEmail())
 					->from(new Address($_ENV['FROM_EMAIL'], $_ENV['FROM_NAME']))
 					->to($user->getEmail())
@@ -79,7 +79,7 @@ class UserController extends AbstractController {
 			// do anything else you need here, like send an email
 
 			$this->addFlash('notice', $this->trans->trans('user.register.emailSent', [], 'security'));
-			return $this->redirectToRoute('index');
+			return $this->redirectToRoute('public_index');
 		}
 
 		return $this->render('user/register.html.twig', ['registrationForm' => $form->createView(),]);
@@ -99,7 +99,7 @@ class UserController extends AbstractController {
 				if ($user) {
 					$user->setResetToken($app->generateAndCheckToken(64, 'User', 'resetToken'));
 					$em->flush();
-					$link = $this->generateUrl('maf_account_reset', ['token' => $user->getResetToken(), 'email'=>$user->getEmail()], UrlGeneratorInterface::ABSOLUTE_URL);
+					$link = $this->generateUrl('user_reset', ['token' => $user->getResetToken(), 'email'=>$user->getEmail()], UrlGeneratorInterface::ABSOLUTE_URL);
 					$text = $trans->trans(
 						'user.reset.email.text', [
 						'%sitename%' => $_ENV['SITE_NAME'],

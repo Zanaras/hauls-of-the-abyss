@@ -4,7 +4,7 @@
 		<id name="id" type="integer">
 			<generator strategy="AUTO"/>
 		</id>
-		<many-to-one field="character" target-entity="Character" invsered-by="teleporters"/>
+		<many-to-one field="character" target-entity="Character" inversed-by="teleporters"/>
 		<many-to-one field="room" target-entity="Room"/>
 
 	</entity>

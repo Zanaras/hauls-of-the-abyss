@@ -87,9 +87,11 @@ body {
     border-top-right-radius:    1em;
     border-bottom-right-radius: 1em;
     margin-top:                 180px;
+    margin-bottom:              0;
     padding:                    2em 3em;
     word-wrap:                  break-word;
     margin-left:                -10px;
+    min-height:                 350px;
 }
 #footer {
     background: rgba(255,250,242,0.6);
@@ -102,6 +104,10 @@ body {
     border: 3px solid black;
     border-radius: 1em;
     text-align: center;
+}
+#footer div {
+    display: inline-block;
+    margin: 0 2em;
 }
 
 /* Navigation Stuff */

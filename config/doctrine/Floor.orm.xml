@@ -6,8 +6,8 @@
 		</id>
 		<many-to-one field="dungeon" target-entity="Dungeon" inversed-by="floors"/>
 		<one-to-many field="rooms" target-entity="Room" mapped-by="floor"/>
-		<one-to-many field="exits" target-entity="Room" mapped-by="leavesFloor"/>
-		<one-to-many field="entrances" target-entity="Room" mapped-by="entersFloor"/>
+		<one-to-many field="exits" target-entity="Room" mapped-by="leavesToFloor"/>
+		<one-to-many field="entrances" target-entity="Room" mapped-by="entersToFloor"/>
 		<one-to-many field="characters" target-entity="Character" mapped-by="floor"/>
 		<one-to-many field="monsters" target-entity="Monster" mapped-by="floor"/>
 
