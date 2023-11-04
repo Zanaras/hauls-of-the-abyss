@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Race;
+use App\Entity\TransitType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -10,6 +10,8 @@ class TransitFixtures extends Fixture {
 
 	private array $types = [
 		'normal' => [],
+		'stairs' => [],
+		'deep pit' => ['fall damage'],
 	];
 
 	public function load(ObjectManager $manager): void {

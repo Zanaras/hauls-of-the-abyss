@@ -2,7 +2,7 @@
 <doctrine-mapping>
 	<entity name="App\Entity\RoomType">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 		<field name="name" type="string"/>
 		<field name="spawn" type="boolean"/>
@@ -12,6 +12,6 @@
 		<field name="allowDown" type="boolean"/>
 		<field name="modifiers" type="array"/>
 		<field name="alternate" type="string" nullable="true"/>
-
+		<field name="minDepth" type="integer"/>
 	</entity>
 </doctrine-mapping>

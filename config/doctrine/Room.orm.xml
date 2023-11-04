@@ -11,13 +11,14 @@
 		<one-to-many field="characters" target-entity="Character" mapped-by="room"/>
 		<one-to-many field="exits" target-entity="Transit" mapped-by="toRoom"/>
 		<one-to-many field="entrances" target-entity="Transit" mapped-by="fromRoom"/>
-		<many-to-one field="leavesFloor" target-entity="Floor" inversed-by="exits"/>
-		<many-to-one field="entersFloor" target-entity="Floor" inversed-by="entrances"/>
+		<many-to-one field="leavesToFloor" target-entity="Floor" inversed-by="exits"/>
+		<many-to-one field="entersToFloor" target-entity="Floor" inversed-by="entrances"/>
 
 		<field name="visits" type="bigint"/>
 		<field name="dungeonExit" type="boolean"/>
 		<field name="modifiers" type="array" nullable="true"/>
 		<field name="pathRoll" type="integer"/>
+		<field name="range" type="integer"/>
 
 	</entity>
 </doctrine-mapping>

@@ -2,7 +2,7 @@
 <doctrine-mapping>
 	<entity name="App\Entity\User" table="appuser">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 		<field name="username" column="username" type="string" length="180" />
 		<field name="email" column="email" type="string" length="180" />

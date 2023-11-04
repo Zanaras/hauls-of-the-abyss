@@ -2,95 +2,125 @@
 
 namespace App\Entity;
 
-class Monster
-{
-    private ?string $name = null;
+class Monster {
+	private ?string $name = null;
+	private ?int $playerKills = null;
+	private ?string $size = null;
+	private ?float $constitution = null;
+	private ?float $spirit = null;
+	private ?int $id = null;
+	private ?float $health = null;
+	private ?MonsterType $type = null;
+	private ?Floor $floor = null;
+	private ?Room $room = null;
+	private ?Dungeon $dungeon = null;
 
-    private ?int $playerKills = null;
+	public function getName(): ?string {
+                  		return $this->name;
+                  	}
 
-    private ?string $size = null;
+	public function setName(?string $name): static {
+                  		$this->name = $name;
+                  
+                  		return $this;
+                  	}
 
-    private ?float $constitution = null;
+	public function getPlayerKills(): ?int {
+                  		return $this->playerKills;
+                  	}
 
-    private ?float $spirit = null;
+	public function setPlayerKills(int $playerKills): static {
+                  		$this->playerKills = $playerKills;
+                  
+                  		return $this;
+                  	}
 
-    private ?int $id = null;
+	public function getSize(): ?string {
+                  		return $this->size;
+                  	}
 
-    private ?MonsterType $type = null;
+	public function setSize(string $size): static {
+                  		$this->size = $size;
+                  
+                  		return $this;
+                  	}
 
-    public function getName(): ?string
+	public function getConstitution(): ?float {
+                  		return $this->constitution;
+                  	}
+
+	public function setConstitution(float $constitution): static {
+                  		$this->constitution = $constitution;
+                  
+                  		return $this;
+                  	}
+
+	public function getSpirit(): ?float {
+                  		return $this->spirit;
+                  	}
+
+	public function setSpirit(float $spirit): static {
+                  		$this->spirit = $spirit;
+                  
+                  		return $this;
+                  	}
+
+	public function getId(): ?int {
+                  		return $this->id;
+                  	}
+
+	public function getType(): ?MonsterType {
+                  		return $this->type;
+                  	}
+
+	public function setType(?MonsterType $type): static {
+                  		$this->type = $type;
+                  
+                  		return $this;
+                  	}
+
+	public function getHealth(): ?float {
+                  		return $this->health;
+                  	}
+
+	public function setHealth(float $health): static {
+                  		$this->health = $health;
+                  
+                  		return $this;
+                  	}
+
+    public function getDungeon(): ?Dungeon
     {
-        return $this->name;
+        return $this->dungeon;
     }
 
-    public function setName(?string $name): static
+    public function setDungeon(?Dungeon $dungeon): static
     {
-        $this->name = $name;
+        $this->dungeon = $dungeon;
 
         return $this;
     }
 
-    public function getPlayerKills(): ?int
+    public function getFloor(): ?Floor
     {
-        return $this->playerKills;
+        return $this->floor;
     }
 
-    public function setPlayerKills(int $playerKills): static
+    public function setFloor(?Floor $floor): static
     {
-        $this->playerKills = $playerKills;
+        $this->floor = $floor;
 
         return $this;
     }
 
-    public function getSize(): ?string
+    public function getRoom(): ?Room
     {
-        return $this->size;
+        return $this->room;
     }
 
-    public function setSize(string $size): static
+    public function setRoom(?Room $room): static
     {
-        $this->size = $size;
-
-        return $this;
-    }
-
-    public function getConstitution(): ?float
-    {
-        return $this->constitution;
-    }
-
-    public function setConstitution(float $constitution): static
-    {
-        $this->constitution = $constitution;
-
-        return $this;
-    }
-
-    public function getSpirit(): ?float
-    {
-        return $this->spirit;
-    }
-
-    public function setSpirit(float $spirit): static
-    {
-        $this->spirit = $spirit;
-
-        return $this;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getType(): ?MonsterType
-    {
-        return $this->type;
-    }
-
-    public function setType(?MonsterType $type): static
-    {
-        $this->type = $type;
+        $this->room = $room;
 
         return $this;
     }

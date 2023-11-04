@@ -2,7 +2,7 @@
 <doctrine-mapping>
 	<entity name="App\Entity\Origin">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 		<field name="name" type="string"/>
 		<field name="public" type="boolean"/>

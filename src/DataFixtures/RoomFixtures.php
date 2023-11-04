@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Race;
+use App\Entity\RoomType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -16,6 +16,7 @@ class RoomFixtures extends Fixture {
 			'allowUp'=>false,
 			'allowDown'=>false,
 			'modifiers'=>false,
+			'minDepth'=>1,
 		],
 		'deep pit' => [
 			'spawn'=>false,
@@ -24,6 +25,7 @@ class RoomFixtures extends Fixture {
 			'allowUp'=>false,
 			'allowDown'=>true,
 			'modifiers'=>false,
+			'minDepth'=>1,
 		],
 		'pit bottom' => [
 			'spawn'=>false,
@@ -33,6 +35,7 @@ class RoomFixtures extends Fixture {
 			'allowDown'=>false,
 			'modifiers'=>false,
 			'alternate'=>'normal',
+			'minDepth'=>3,
 		],
 		'teleporter' => [
 			'spawn'=>false,
@@ -41,6 +44,7 @@ class RoomFixtures extends Fixture {
 			'allowUp'=>false,
 			'allowDown'=>false,
 			'modifiers'=>false,
+			'minDepth'=>5,
 		],
 		'portal' => [
 			'spawn'=>false,
@@ -49,6 +53,7 @@ class RoomFixtures extends Fixture {
 			'allowUp'=>false,
 			'allowDown'=>false,
 			'modifiers'=>false,
+			'minDepth'=>25,
 		],
 		'stairs' => [
 			'spawn'=>false,
@@ -57,25 +62,43 @@ class RoomFixtures extends Fixture {
 			'allowUp'=>true,
 			'allowDown'=>true,
 			'modifiers'=>false,
+			'minDepth'=>1,
 		],
 	];
 
+	# Default values for missing array keys above.
+	const SPAWN = false;
+	const TELEPORTER = false;
+	const PORTAL = false;
+	const ALLOWUP = false;
+	const ALLOWDOWN = false;
+	const MODIFIERS = [];
+	const MINDEPTH = 1;
+
+	/**
+	 * Loads the above array(s) into the RoomType Database table.
+	 * Fairly resilient, assumes default values for missing entries.
+	 * @param ObjectManager $manager
+	 *
+	 * @return void
+	 */
 	public function load(ObjectManager $manager): void {
 		echo 'Loading RoomTypes...';
 		foreach ($this->types as $name=>$data) {
 			$type = $manager->getRepository('App:RoomType')->findOneBy(['name'=>$name]);
 			if (!$type) {
 				echo 'New race detected. Adding!';
-				$type = new Race();
+				$type = new RoomType();
 				$manager->persist($type);
 				$type->setName($name);
 			}
-			$type->setSpawn($data['spawn']?:false);
-			$type->setTeleporter($data['teleporter']?:false);
-			$type->setPortal($data['portal']?:false);
-			$type->setAllowUp($data['allowUp']?:false);
-			$type->setAllowDown($data['allowDown']?:false);
-			$type->setModifiers($data['modifiers']?:[]);
+			$type->setSpawn($data['spawn']?:self::SPAWN);
+			$type->setTeleporter($data['teleporter']?:self::TELEPORTER);
+			$type->setPortal($data['portal']?:self::PORTAL);
+			$type->setAllowUp($data['allowUp']?:self::ALLOWUP);
+			$type->setAllowDown($data['allowDown']?:self::ALLOWDOWN);
+			$type->setModifiers($data['modifiers']?:self::MODIFIERS);
+			$type->setMinDepth($data['minDepth']?:self::MINDEPTH);
 		}
 
 		$manager->flush();

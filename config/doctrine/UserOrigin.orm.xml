@@ -2,7 +2,7 @@
 <doctrine-mapping>
 	<entity name="App\Entity\UserOrigin">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 		<field name="dateUnlocked" type="datetime"/>
 		<many-to-one field="user" target-entity="User" inversed-by="unlockedOrigins"/>

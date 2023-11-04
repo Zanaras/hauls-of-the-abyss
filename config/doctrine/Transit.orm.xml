@@ -10,6 +10,7 @@
 		<many-to-one field="toRoom" target-entity="Room" inversed-by="entrances"/>
 
 		<field name="transits" type="bigint"/>
+		<field name="direction" type="string" length="2"/>
 
 	</entity>
 </doctrine-mapping>

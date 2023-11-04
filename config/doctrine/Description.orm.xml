@@ -2,7 +2,7 @@
 <doctrine-mapping>
     <entity name="App\Entity\Description">
         <id name="id" type="integer">
-            <generator strategy="IDENTITY"/>
+            <generator strategy="AUTO"/>
         </id>
 
         <many-to-one field="character" target-entity="Character" inversed-by="descriptions"/>

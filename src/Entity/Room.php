@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 
 class Room {
 	private ?string $visits = null;
@@ -14,223 +13,231 @@ class Room {
 	private Collection $entrances;
 	private ?Dungeon $dungeon = null;
 	private ?RoomType $type = null;
-
-    private ?bool $dungeonExit = null;
-
-    private ?array $modifiers = null;
-
-    private ?int $pathRoll = null;
-
-    private ?Floor $floor = null;
-
-    private ?RoomType $altType = null;
-
-    private ?Floor $leavesFloor = null;
-
-    private ?Floor $entersFloor = null;
+	private ?bool $dungeonExit = null;
+	private ?array $modifiers = null;
+	private ?int $pathRoll = null;
+	private ?int $range = null;
+	private ?Floor $floor = null;
+	private ?RoomType $altType = null;
+	private ?Floor $leavesToFloor = null;
+	private ?Floor $entersToFloor = null;
 
 	public function __construct() {
-                                                                  		$this->characters = new ArrayCollection();
-                                                                  		$this->exits = new ArrayCollection();
-                                                                  		$this->entrances = new ArrayCollection();
-                                                                  	}
+		$this->characters = new ArrayCollection();
+		$this->exits = new ArrayCollection();
+		$this->entrances = new ArrayCollection();
+	}
+
+	public function findAvailableDirection() {
+		$all = [
+			1 => "N",
+			2 => "NE",
+			3 => "E",
+			4 => "SE",
+			5 => "S",
+			6 => "SW",
+			7 => "W",
+			8 => "NW",
+		];
+		$max = 8;
+		foreach ($this->exits as $transits) {
+			unset($a)
+		}
+
+	}
 
 	public function getVisits(): ?string {
-                                                                  		return $this->visits;
-                                                                  	}
+		return $this->visits;
+	}
 
 	public function setVisits(string $visits): static {
-                                                                  		$this->visits = $visits;
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		$this->visits = $visits;
+
+		return $this;
+	}
 
 	public function getId(): ?int {
-                                                                  		return $this->id;
-                                                                  	}
+		return $this->id;
+	}
 
 	/**
 	 * @return Collection<int, Character>
 	 */
 	public function getCharacters(): Collection {
-                                                                  		return $this->characters;
-                                                                  	}
+		return $this->characters;
+	}
 
 	public function addCharacter(Character $character): static {
-                                                                  		if (!$this->characters->contains($character)) {
-                                                                  			$this->characters->add($character);
-                                                                  			$character->setRoom($this);
-                                                                  		}
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		if (!$this->characters->contains($character)) {
+			$this->characters->add($character);
+			$character->setRoom($this);
+		}
+
+		return $this;
+	}
 
 	public function removeCharacter(Character $character): static {
-                                                                  		if ($this->characters->removeElement($character)) {
-                                                                  			// set the owning side to null (unless already changed)
-                                                                  			if ($character->getRoom() === $this) {
-                                                                  				$character->setRoom(null);
-                                                                  			}
-                                                                  		}
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		if ($this->characters->removeElement($character)) {
+			// set the owning side to null (unless already changed)
+			if ($character->getRoom() === $this) {
+				$character->setRoom(null);
+			}
+		}
+
+		return $this;
+	}
 
 	/**
 	 * @return Collection<int, Transit>
 	 */
 	public function getExits(): Collection {
-                                                                  		return $this->exits;
-                                                                  	}
+		return $this->exits;
+	}
 
 	public function addExit(Transit $exit): static {
-                                                                  		if (!$this->exits->contains($exit)) {
-                                                                  			$this->exits->add($exit);
-                                                                  			$exit->setToRoom($this);
-                                                                  		}
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		if (!$this->exits->contains($exit)) {
+			$this->exits->add($exit);
+			$exit->setToRoom($this);
+		}
+
+		return $this;
+	}
 
 	public function removeExit(Transit $exit): static {
-                                                                  		if ($this->exits->removeElement($exit)) {
-                                                                  			// set the owning side to null (unless already changed)
-                                                                  			if ($exit->getToRoom() === $this) {
-                                                                  				$exit->setToRoom(null);
-                                                                  			}
-                                                                  		}
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		if ($this->exits->removeElement($exit)) {
+			// set the owning side to null (unless already changed)
+			if ($exit->getToRoom() === $this) {
+				$exit->setToRoom(null);
+			}
+		}
+
+		return $this;
+	}
 
 	/**
 	 * @return Collection<int, Transit>
 	 */
 	public function getEntrances(): Collection {
-                                                                  		return $this->entrances;
-                                                                  	}
+		return $this->entrances;
+	}
 
 	public function addEntrance(Transit $entrance): static {
-                                                                  		if (!$this->entrances->contains($entrance)) {
-                                                                  			$this->entrances->add($entrance);
-                                                                  			$entrance->setFromRoom($this);
-                                                                  		}
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		if (!$this->entrances->contains($entrance)) {
+			$this->entrances->add($entrance);
+			$entrance->setFromRoom($this);
+		}
+
+		return $this;
+	}
 
 	public function removeEntrance(Transit $entrance): static {
-                                                                  		if ($this->entrances->removeElement($entrance)) {
-                                                                  			// set the owning side to null (unless already changed)
-                                                                  			if ($entrance->getFromRoom() === $this) {
-                                                                  				$entrance->setFromRoom(null);
-                                                                  			}
-                                                                  		}
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		if ($this->entrances->removeElement($entrance)) {
+			// set the owning side to null (unless already changed)
+			if ($entrance->getFromRoom() === $this) {
+				$entrance->setFromRoom(null);
+			}
+		}
+
+		return $this;
+	}
 
 	public function getDungeon(): ?Dungeon {
-                                                                  		return $this->dungeon;
-                                                                  	}
+		return $this->dungeon;
+	}
 
 	public function setDungeon(?Dungeon $dungeon): static {
-                                                                  		$this->dungeon = $dungeon;
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		$this->dungeon = $dungeon;
+
+		return $this;
+	}
 
 	public function getType(): ?RoomType {
-                                                                  		return $this->type;
-                                                                  	}
+		return $this->type;
+	}
 
 	public function setType(?RoomType $type): static {
-                                                                  		$this->type = $type;
-                                                                  
-                                                                  		return $this;
-                                                                  	}
+		$this->type = $type;
 
-    public function isDungeonExit(): ?bool
-    {
-        return $this->dungeonExit;
-    }
+		return $this;
+	}
 
-    public function setDungeonExit(bool $dungeonExit): static
-    {
-        $this->dungeonExit = $dungeonExit;
+	public function isDungeonExit(): ?bool {
+		return $this->dungeonExit;
+	}
 
-        return $this;
-    }
+	public function setDungeonExit(bool $dungeonExit): static {
+		$this->dungeonExit = $dungeonExit;
 
-    public function getModifiers(): ?array
-    {
-        return $this->modifiers;
-    }
+		return $this;
+	}
 
-    public function setModifiers(?array $modifiers): static
-    {
-        $this->modifiers = $modifiers;
+	public function getModifiers(): ?array {
+		return $this->modifiers;
+	}
 
-        return $this;
-    }
+	public function setModifiers(?array $modifiers): static {
+		$this->modifiers = $modifiers;
 
-    public function getPathRoll(): ?int
-    {
-        return $this->pathRoll;
-    }
+		return $this;
+	}
 
-    public function setPathRoll(int $pathRoll): static
-    {
-        $this->pathRoll = $pathRoll;
+	public function getPathRoll(): ?int {
+		return $this->pathRoll;
+	}
 
-        return $this;
-    }
+	public function setPathRoll(int $pathRoll): static {
+		$this->pathRoll = $pathRoll;
 
-    public function getFloor(): ?Floor
-    {
-        return $this->floor;
-    }
+		return $this;
+	}
 
-    public function setFloor(?Floor $floor): static
-    {
-        $this->floor = $floor;
+	public function getFloor(): ?Floor {
+		return $this->floor;
+	}
 
-        return $this;
-    }
+	public function setFloor(?Floor $floor): static {
+		$this->floor = $floor;
 
-    public function getAltType(): ?RoomType
-    {
-        return $this->altType;
-    }
+		return $this;
+	}
 
-    public function setAltType(?RoomType $altType): static
-    {
-        $this->altType = $altType;
+	public function getAltType(): ?RoomType {
+		return $this->altType;
+	}
 
-        return $this;
-    }
+	public function setAltType(?RoomType $altType): static {
+		$this->altType = $altType;
 
-    public function getLeavesFloor(): ?Floor
-    {
-        return $this->leavesFloor;
-    }
+		return $this;
+	}
 
-    public function setLeavesFloor(?Floor $leavesFloor): static
-    {
-        $this->leavesFloor = $leavesFloor;
+	public function getRange(): ?int {
+		return $this->range;
+	}
 
-        return $this;
-    }
+	public function setRange(int $range): static {
+		$this->range = $range;
 
-    public function getEntersFloor(): ?Floor
-    {
-        return $this->entersFloor;
-    }
+		return $this;
+	}
 
-    public function setEntersFloor(?Floor $entersFloor): static
-    {
-        $this->entersFloor = $entersFloor;
+	public function getLeavesToFloor(): ?Floor {
+		return $this->leavesToFloor;
+	}
 
-        return $this;
-    }
+	public function setLeavesToFloor(?Floor $leavesToFloor): static {
+		$this->leavesToFloor = $leavesToFloor;
+
+		return $this;
+	}
+
+	public function getEntersToFloor(): ?Floor {
+		return $this->entersToFloor;
+	}
+
+	public function setEntersToFloor(?Floor $entersToFloor): static {
+		$this->entersToFloor = $entersToFloor;
+
+		return $this;
+	}
 }

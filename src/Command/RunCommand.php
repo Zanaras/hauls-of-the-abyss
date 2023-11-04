@@ -43,6 +43,7 @@ class RunCommand extends Command {
 			$dungeonCount++;
 			$this->dm->checkDungeon($dungeon);
 		}
+
 		# This is basically a game initialization check.
 		if ($dungeonCount === 0) {
 			$dungeon = new Dungeon();

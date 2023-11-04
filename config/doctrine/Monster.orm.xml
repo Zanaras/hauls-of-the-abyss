@@ -2,10 +2,14 @@
 <doctrine-mapping>
 	<entity name="App\Entity\Monster">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 
         <many-to-one field="type" target-entity="MonsterType" />
+		<!-- Dungeon is deliberately one way, as there will be a lot of these. -->
+		<many-to-one field="dungeon" target-entity="Dungeon"/>
+		<many-to-one field="floor" target-entity="Floor" inversed-by="monsters"/>
+		<many-to-one field="room" target-entity="Room" inversed-by="monsters"/>
 
 		<field name="name" type="string" nullable="true"/>
 		<field name="playerKills" type="integer"/>

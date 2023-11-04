@@ -2,7 +2,7 @@
 <doctrine-mapping>
 	<entity name="App\Entity\CharacterTeleporter">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 		<many-to-one field="character" target-entity="Character" invsered-by="teleporters"/>
 		<many-to-one field="room" target-entity="Room"/>

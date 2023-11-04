@@ -2,7 +2,7 @@
 <doctrine-mapping>
 	<entity name="App\Entity\Character" table="userchar">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 		<field name="name" type="string"/>
 
@@ -32,6 +32,7 @@
 			</order-by>
 		</one-to-many>
 		<many-to-one field="dungeon" target-entity="Dungeon" inversed-by="characters"/>
+		<many-to-one field="floor" target-entity="Floor" inversed-by="characters"/>
 		<many-to-one field="room" target-entity="Room" inversed-by="characters"/>
 		<many-to-one field="lastRoom" target-entity="Room"/>
 		<one-to-many field="skills" target-entity="Skill" mapped-by="character"/>

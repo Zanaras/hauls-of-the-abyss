@@ -2,7 +2,7 @@
 <doctrine-mapping>
 	<entity name="App\Entity\TransitType">
 		<id name="id" type="integer">
-			<generator strategy="IDENTITY"/>
+			<generator strategy="AUTO"/>
 		</id>
 		<field name="name" type="string"/>
 		<field name="modifiers" type="array"/>
