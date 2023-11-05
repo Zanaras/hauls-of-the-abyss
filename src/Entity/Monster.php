@@ -10,7 +10,7 @@ class Monster {
 	private ?float $spirit = null;
 	private ?int $id = null;
 	private ?float $health = null;
-	private ?MonsterType $type = null;
+	private ?MonsterType $race = null;
 	private ?Floor $floor = null;
 	private ?Room $room = null;
 	private ?Dungeon $dungeon = null;
@@ -71,16 +71,6 @@ class Monster {
 
 	public function getId(): ?int {
 		return $this->id;
-	}
-
-	public function getType(): ?MonsterType {
-		return $this->type;
-	}
-
-	public function setType(?MonsterType $type): static {
-		$this->type = $type;
-
-		return $this;
 	}
 
 	public function getHealth(): ?float {
@@ -149,6 +139,26 @@ class Monster {
 
 	public function setAlive(bool $alive): static {
 		$this->alive = $alive;
+
+		return $this;
+	}
+
+	public function getAttackTypes(): array {
+		return $this->attackTypes;
+	}
+
+	public function setAttackTypes(array $attackTypes): static {
+		$this->attackTypes = $attackTypes;
+
+		return $this;
+	}
+
+	public function getRace(): ?MonsterType {
+		return $this->race;
+	}
+
+	public function setRace(?MonsterType $race): static {
+		$this->race = $race;
 
 		return $this;
 	}

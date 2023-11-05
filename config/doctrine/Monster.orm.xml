@@ -5,7 +5,7 @@
 			<generator strategy="AUTO"/>
 		</id>
 
-        <many-to-one field="type" target-entity="MonsterType" />
+        <many-to-one field="race" target-entity="MonsterType" />
 		<!-- Dungeon is deliberately one way, as there will be a lot of these. -->
 		<many-to-one field="dungeon" target-entity="Dungeon"/>
 		<many-to-one field="floor" target-entity="Floor" inversed-by="monsters"/>
@@ -14,9 +14,6 @@
 		<field name="name" type="string" nullable="true"/>
 		<field name="playerKills" type="integer"/>
 		<field name="health" type="float"/>
-		<field name="size" type="string"/>
-		<field name="constitution" type="float"/>
-		<field name="spirit" type="float"/>
 		<field name="image" type="string" nullable="true"/>
 		<field name="imageDead" type="string" nullable="true"/>
 		<field name="attackTypes" type="array"/>

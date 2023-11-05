@@ -140,7 +140,7 @@ class GateKeeper {
 		return [
 			'name' => $title,
 			'url' => $route,
-			'parameters'=>[],
+			'parameters'=>$params,
 		];
 	}
 
@@ -174,6 +174,7 @@ class GateKeeper {
 		$options = [];
 		$options[] = $this->dungeon_status_test($char);
 		$options[] = $this->dungeon_enter_test($char);
+		$options[] = $this->dungeon_exit_test($char);
 		$options[] = $this->dungeon_retreat_test($char);
 		if ($room = $char->getRoom()) {
 			foreach ($room->getExits() as $exit) {
@@ -220,6 +221,17 @@ class GateKeeper {
 		}
 		if ($char->getAreaCode() === self::DUNGEON && $char->getRoom()) {
 			return $this->fail($title, 'dungeon.alreadyin');
+		}
+		return $this->pass($title, $route);
+	}
+
+	private function dungeon_exit_test(Character $char, string $route = 'dungeon_exit'): array {
+		$title = 'Exit the Abyss';
+		if ($char->getAreaCode() !== self::DUNGEON) {
+			return $this->fail($title, 'generic.notindungeon');
+		}
+		if (!$char->getRoom()) {
+			return $this->fail($title, 'dungeon.notexploring');
 		}
 		return $this->pass($title, $route);
 	}

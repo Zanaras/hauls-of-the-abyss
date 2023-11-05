@@ -11,6 +11,13 @@
         <field name="image" type="string" />
         <field name="imageDead" type="string" />
 		<field name="attackTypes" type="array"/>
+		<field name="agility" type="float"/>
+		<field name="charisma" type="float"/>
+		<field name="constitution" type="float"/>
+		<field name="endurance" type="float"/>
+		<field name="intelligence" type="float"/>
+		<field name="spirit" type="float"/>
+		<field name="perception" type="float"/>
 
 	</entity>
 </doctrine-mapping>
