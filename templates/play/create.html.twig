@@ -1,18 +1,13 @@
 {% extends "base.html.twig" %}
 
-{% block content %}
+{% block body %}
     <h2>Create A Character</h2>
     <p>Characters in Hauls of the Abyss can be one of many races and have one of many origins, each with their own upsides and downsides.</p>
     <p>For instance, humans are considered "average", while orcs are stronger but less agile, and goblins are more agile but can take fewer hits.</p>
-    <p>Notice: You have {{  }}</p>
+    <p>Notice: You have {{ activeChars }} of {{ allowedChars }} allowed characters.</p>
 
-    {% if limit <= 0 %}
-        <div class="warning">{{ 'newcharacter.limited'|trans }}</div>
-    {% elseif limit < 6 %}
-        <p>{{ 'newcharacter.limit'|trans({"count":limit, "%limit%":limit}) }}</p>
-    {% endif %}
-    {% if spawnlimit %}
-        <div class="error">{{ 'newcharacter.spawnlimit'|trans|raw }}</div>
+    {% if not makeMore %}
+        <div class="error"><p>It doesn't look like you can make any more characters. <a href="{{ link('user_characters') }}">Return to Characters List.</a></div>
     {% else %}
         {{ form(form) }}
     {% endif %}

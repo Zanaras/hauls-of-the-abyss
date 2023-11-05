@@ -83,11 +83,11 @@ class RoomFixtures extends Fixture {
 	 * @return void
 	 */
 	public function load(ObjectManager $manager): void {
-		echo 'Loading RoomTypes...';
+		echo "Loading RoomTypes...\n";
 		foreach ($this->types as $name=>$data) {
-			$type = $manager->getRepository('App:RoomType')->findOneBy(['name'=>$name]);
+			$type = $manager->getRepository(RoomType::class)->findOneBy(['name'=>$name]);
 			if (!$type) {
-				echo 'New race detected. Adding!';
+				echo "New $name detected. Adding!";
 				$type = new RoomType();
 				$manager->persist($type);
 				$type->setName($name);

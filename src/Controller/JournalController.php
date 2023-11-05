@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\ActivityReport;
-use App\Entity\BattleReport;
 use App\Entity\Character;
 use App\Entity\GuideKeeper;
 use App\Entity\Journal;
@@ -12,6 +10,7 @@ use App\Form\JournalType;
 use App\Form\UserReportType;
 use App\Service\AppState;
 use App\Service\DiscordIntegrator;
+use App\Service\GateKeeper;
 use App\Service\NotificationManager;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,11 +23,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class JournalController extends AbstractController {
 	private AppState $app;
+	private GateKeeper $gk;
 	private EntityManagerInterface $em;
 	private TranslatorInterface $trans;
 
-	public function __construct(AppState $app, EntityManagerInterface $em, TranslatorInterface $trans) {
+	public function __construct(AppState $app, EntityManagerInterface $em, GateKeeper $gk, TranslatorInterface $trans) {
 		$this->app = $app;
+		$this->gk = $gk;
 		$this->em = $em;
 		$this->trans = $trans;
 	}
@@ -40,16 +41,16 @@ class JournalController extends AbstractController {
 			$gm = false;
 			$admin = false;
 		} else {
-			$gm = $this->isGranted('ROLE_OLYMPUS');
+			$gm = $this->isGranted('ROLE_DUNGEON_MASTER');
 			$admin = $this->isGranted('ROLE_ADMIN');
 		}
 		$bypass = false;
-		if ($id->isPrivate() && !$gm) {
+		if (!$id->isPublic() && !$gm) {
 			if (!$user || ($user && $user !== $id->getCharacter()->getUser())) {
 				$this->addFlash('notice', "Sorry, but this journal entry is private, and you don't have access to it.");
 				return $this->redirectToRoute('user_characters');
 			}
-		} elseif ($id->isPrivate() && $gm) {
+		} elseif (!$id->isPublic() && $gm) {
 			$bypass = true;
 		}
 
@@ -62,12 +63,12 @@ class JournalController extends AbstractController {
 		]);
 	}
 
-	#[Route ('/write', name: 'journal_write')]
-	#[Route ('/write/')]
+	#[Route ('/journal/write', name: 'journal_write')]
 	public function journalWriteAction(NotificationManager $note, Request $request): RedirectResponse|Response {
-		$character = $this->disp->gateway('journalWriteTest');
-		if (!$character instanceof Character) {
-			return $this->redirectToRoute($character);
+		$character = $this->gk->gateway('journal_write');
+		if ($character instanceof GuideKeeper) {
+			$this->addFlash('error', $this->trans->trans($character->getReason(), [], 'gatekeeper'));
+			return new RedirectResponse($character->getRoute());
 		}
 
 		$form = $this->createForm(JournalType::class);
@@ -80,7 +81,7 @@ class JournalController extends AbstractController {
 			$em = $this->em;
 			$em->persist($journal);
 			$em->flush();
-			if (!$journal->isPrivate() && !$journal->isGraphic()) {
+			if ($journal->isPublic() && !$journal->isGraphic()) {
 				$note->spoolJournal($journal);
 			}
 			$this->addFlash('notice', "Your journal has been written successfully!");
@@ -96,7 +97,6 @@ class JournalController extends AbstractController {
 		$journal = new Journal;
 		$journal->setCharacter($char);
 		$journal->setDate(new DateTime('now'));
-		$journal->setCycle($this->app->getCycle());
 		$journal->setLanguage('English');
 		$journal->setTopic($data['topic']);
 		$journal->setEntry($data['entry']);
@@ -110,11 +110,12 @@ class JournalController extends AbstractController {
 		return $journal;
 	}
 
-	#[Route ('/journal/mine', name: 'maf_journal_mine')]
+	#[Route ('/journal/mine', name: 'journal_mine')]
 	public function journalMineAction(): RedirectResponse|Response {
-		$character = $this->disp->gateway('journalMineTest');
-		if (!$character instanceof Character) {
-			return $this->redirectToRoute($character);
+		$character = $this->gk->gateway('journal_mine');
+		if ($character instanceof GuideKeeper) {
+			$this->addFlash('error', $this->trans->trans($character->getReason(), [], 'gatekeeper'));
+			return new RedirectResponse($character->getRoute());
 		}
 
 		return $this->render('journal/mine.html.twig', [
@@ -131,7 +132,7 @@ class JournalController extends AbstractController {
 
 	#[Route ('/journal/report/{id}', name: 'journal_report', requirements: ['id' => '\d+'])]
 	public function journalReportAction(DiscordIntegrator $discord, Request $request, Journal $id): RedirectResponse|Response {
-		if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+		if ($this->isGranted('IS_AUTHENTICATED')) {
 			$form = $this->createForm(UserReportType::class);
 			$form->handleRequest($request);
 			if ($form->isSubmitted() && $form->isValid()) {
@@ -148,10 +149,10 @@ class JournalController extends AbstractController {
 				}
 				$em->persist($report);
 				$em->flush();
-				$text = '[' . $user->getUsername() . '](https://mightandfealty.com/user/' . $user->getId() . ') has reported the journal: [' . $id->getTopic() . '](https://mightandfealty.com/journal/' . $id->getId() . ').';
-				$discord->pushToOlympus($text);
+				$text = $user->getUsername() . ' has reported the journal: [' . $id->getTopic() . '](https://hualsoftheabyss.com/journal/' . $id->getId() . ').';
+				$discord->pushToDungeonMaster($text);
 				$this->addFlash('notice', $this->trans->trans('journal.report.success', [], 'messages'));
-				return $this->redirectToRoute('maf_journal', ['id' => $id->getId()]);
+				return $this->redirectToRoute('journal_read', ['id' => $id->getId()]);
 			} else {
 				return $this->render('Journal/report.html.twig', [
 					'journal' => $id,
@@ -160,32 +161,32 @@ class JournalController extends AbstractController {
 			}
 		} else {
 			$this->addFlash('notice', $this->trans->trans('journal.report.failure', [], 'messages'));
-			return $this->redirectToRoute('maf_journal', ['id' => $id->getId()]);
+			return $this->redirectToRoute('journal_read', ['id' => $id->getId()]);
 		}
 	}
 
 	#[Route ('/journal/gmprivate/{id}', name: 'journal_gmprivate', requirements: ['id' => '\d+'])]
 	public function journalGMPrivateAction(Journal $id): RedirectResponse {
-		if ($this->isGranted('ROLE_OLYMPUS')) {
+		if ($this->isGranted('ROLE_DUNGEON_MASTER')) {
 			$id->setGMPrivate(true);
 			$this->em->flush();
 			$this->addFlash('notice', $this->trans->trans('journal.gm.private.success', [], 'messages'));
 		} else {
 			$this->addFlash('notice', $this->trans->trans('journal.gm.private.failure', [], 'messages'));
 		}
-		return $this->redirectToRoute('maf_journal', ['id' => $id->getId()]);
+		return $this->redirectToRoute('journal_read', ['id' => $id->getId()]);
 	}
 
 	#[Route ('/journal/graphic/{id}', name: 'journal_gmgraphic', requirements: ['id' => '\d+'])]
 	public function journalGMGraphicAction(Journal $id): RedirectResponse {
-		if ($this->isGranted('ROLE_OLYMPUS')) {
+		if ($this->isGranted('ROLE_DUNGEON_MASTER')) {
 			$id->setGMGraphic(true);
 			$this->em->flush();
 			$this->addFlash('notice', $this->trans->trans('journal.gm.graphic.success', [], 'messages'));
 		} else {
 			$this->addFlash('notice', $this->trans->trans('journal.gm.graphic.failure', [], 'messages'));
 		}
-		return $this->redirectToRoute('maf_journal', ['id' => $id->getId()]);
+		return $this->redirectToRoute('journal_read', ['id' => $id->getId()]);
 	}
 
 	#[Route ('/journal/gmremove/{id}', name: 'journal_gmremove', requirements: ['id' => '\d+'])]
@@ -198,7 +199,7 @@ class JournalController extends AbstractController {
 			return $this->redirectToRoute('maf_gm_pending');
 		} else {
 			$this->addFlash('notice', $this->trans->trans('journal.gm.remove.failure', [], 'messages'));
-			return $this->redirectToRoute('maf_index');
+			return $this->redirectToRoute('public_index');
 		}
 	}
 }

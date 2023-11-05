@@ -1,0 +1,41 @@
+# Hauls of the Abyss
+# Text translation strings for site play controller.
+# Author: Andrew Gwynn
+# Contact: hotateam@lemuriacommunity.org
+
+race:
+  human:
+    name: Human
+    desc: Humans are about as average as you can get for the various races. Average height, average abilities, just average.
+  goblin:
+    name: Goblin
+    desc: A smaller race with higher agility, endurance, and perception, but lower ability and constitution, they're also known to not always be sentient--having sometimes fallen into feralness.
+
+form:
+  character:
+    name:
+      title: Name
+      help: The name of your character that shows up in game.
+    gender:
+      title: Gender
+      help: Gender your character identifies as.
+      choice:
+        genderless: Genderless
+        female: Female
+        male: Male
+        non-binary: Non-binary
+        other: Other
+    origin:
+      title: Origin
+      help: How you ended up in the world of the Abyss.
+      choice:
+        earthDeath: Died on Modern Earth
+        fantasyDeath: Died on a Fantasy world
+        fantasyPortal: Entered a strange portal on a Fantasy world
+    race:
+      title: Race
+      help: Races determine the basic stats of your character.
+    submit: Enter the World
+
+
+

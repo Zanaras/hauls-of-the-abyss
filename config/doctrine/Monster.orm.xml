@@ -17,6 +17,9 @@
 		<field name="size" type="string"/>
 		<field name="constitution" type="float"/>
 		<field name="spirit" type="float"/>
+		<field name="image" type="string" nullable="true"/>
+		<field name="imageDead" type="string" nullable="true"/>
+		<field name="attackTypes" type="array"/>
 
 	</entity>
 </doctrine-mapping>

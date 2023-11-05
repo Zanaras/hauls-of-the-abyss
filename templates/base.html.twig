@@ -5,13 +5,19 @@
         {% set theme = 'default' %}
         <meta charset="UTF-8">
         <title id="title">
-            {% block title %}{% endblock %}
+            {{ SITE_SHORT }} - {% block title %}{% endblock %}
         </title>
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('/css/'~theme~'.css') }}"/>
         {% endblock %}
     </head>
     <body>
+    <h1 id="title" class="logo">
+        <p><a href="{{ path('public_index') }}">
+            TODO: put Hauls of the Abyss logo here
+        </a></p>
+    </h1>
+    {% block bodyScripts %}{% endblock %}
         <div id="symfony-wrapper" data-role="page">
             <div style="clear: both"></div>
             <div id="nav">

@@ -1,6 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello PublicController!{% endblock %}
+{% block title %}Index{% endblock %}
+
+{% block bodyScripts %}
+    <script type="text/javascript" src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
 
 {% block body %}
     <div class="index_journal">
@@ -32,17 +36,17 @@
         <p>Hauls fo the Abyss, a persisitent, online, optionally-multiplayer, dungeon crawler in procedurally generated,
             infinite dungeon.</p>
         {% if app.user and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+            <div id="actionlist" class="boxlist">
+                {% set elements = {
+                    0:{"name":"Characters", "url":"user_characters", "description":"View your Characters"},
+                    1:{"name":"Logout", "url":"user_logout", "description":""}
+                } %}
+                {% include "parts/linklist.html.twig" with {"list":{"elements":elements}, "domain":'messages'} only %}
+            </div>
         {% else %}
             <div class="index_register">
                 <h2>{{ 'New User Signup'|trans({}, 'user') }}</h2>
-                {{ form_start(form) }}
-                {{ form_row(form.username) }}
-                {{ form_row(form.plainPassword) }}<br>
-                {{ form_row(form.email) }}<br>
-                Agree to <a href="{{ url("public_terms") }}">Terms of Service</a>: {{ form_row(form.agreeTerms) }}
-                Receive Newsletter via Email: {{ form_row(form.newsletter) }}
-                {{ form_row(form.submit) }}
-                {{ form_end(form) }}
+                {% include "parts/registration.html.twig" with {'form': form} %}
             </div>
             <div class="index_login">
                 <form action="{{ path('user_login') }}" method="post">

@@ -1,0 +1,10 @@
+
+{{ form_start(form) }}
+{{ form_row(form.username) }}
+{{ form_row(form.plainPassword) }}<br>
+{{ form_row(form.email) }}<br>
+Agree to <a href="{{ url("public_terms") }}">Terms of Service</a>: {{ form_row(form.agreeTerms) }}
+Receive Newsletter via Email: {{ form_row(form.newsletter) }}
+<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}"></div>
+{{ form_row(form.submit) }}
+{{ form_end(form) }}

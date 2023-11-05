@@ -18,7 +18,7 @@
 		<field name="pits" type="smallint"/>
 		<field name="type" type="string"/>
 		<field name="finalized" type="boolean"/>
-		<field name="popRate" type="float"/>
+		<field name="popRate" type="float" nullable="true"/>
 
 
 	</entity>

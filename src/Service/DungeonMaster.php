@@ -3,9 +3,10 @@
 namespace App\Service;
 
 use App\Entity\Character;
+use App\Entity\Dungeon;
 use App\Entity\Floor;
 use App\Entity\Monster;
-use App\Entity\Dungeon;
+use App\Entity\MonsterType;
 use App\Entity\Room;
 use App\Entity\Skill;
 use App\Entity\SkillType;
@@ -22,6 +23,7 @@ class DungeonMaster {
 	const BASEPOPRATE = 0.85;
 	const POPDEPTHMIN = 0.69;
 	const POPDEPTHMAX = 2.71;
+	const BASEENERGY = 300;
 
 	public function __construct(Architect $architect, EntityManagerInterface $em, TranslatorInterface $trans) {
 		$this->architect = $architect;
@@ -29,10 +31,12 @@ class DungeonMaster {
 		$this->trans = $trans;
 	}
 
+	public function calculateMaxEnergy(Character $char): float {
+		return (float)self::BASEENERGY * $char->getRace()->getEndurance();
+	}
+
 	public function checkDungeon(Dungeon $dungeon): void {
-		$floors = $this->em->createQuery(
-			'SELECT f FROM App:Floor WHERE dungeon = :dungeon ORDER BY actualDepth DESC'
-		)->setParameters(['dungeon'=>$dungeon])->getResult();
+		$floors = $this->em->createQuery('SELECT f FROM App:Floor f WHERE f.dungeon = :dungeon ORDER BY f.actualDepth DESC')->setParameters(['dungeon' => $dungeon])->getResult();
 		$floorCount = $dungeon->getFloors()->count();
 		$lowest = 0;
 		$lowestOccupied = null;
@@ -47,28 +51,34 @@ class DungeonMaster {
 				$floors[] = $this->architect->buildFloor($dungeon, $count, $count);
 			}
 		} else {
-			 foreach ($floors as $floor) {
-				 if (!$lowest) {
-					 # Yay PHP, 0 evalutates to false, so this only gets hit the first time.
-					 $lowest = $floor->getActualDepth();
-				 }
-				 if ($floor->getVisits() < 1) {
-					 # Don't care about empty floors.
-					 continue;
-				 } else {
-					 $lowestOccupied = $floor;
-					 break;
-				 }
-			 }
-			 $difference = $lowest-$lowestOccupied->getActualDepth();
-			 $count = 0;
-			 if ($difference < self::PREBUILD) {
-				 while ($count < self::PREBUILD) {
-					 $count++;
-					 $floors[] = $this->architect->buildFloor($dungeon, $lowestOccupied->getActualDepth()+1, $lowestOccupied->getRelativeDepth()+1);
-				 }
-			 }
+			foreach ($floors as $floor) {
+				if (!$lowest) {
+					# Yay PHP, 0 evalutates to false, so this only gets hit the first time.
+					$lowest = $floor->getActualDepth();
+				}
+				if ($floor->getVisits() < 1) {
+					# Don't care about empty floors.
+					continue;
+				} else {
+					$lowestOccupied = $floor;
+					break;
+				}
+			}
+			if ($lowestOccupied) {
+				$difference = $lowest - $lowestOccupied->getActualDepth();
+				$count = 1;
+				if ($difference < self::PREBUILD) {
+					while ($count < self::PREBUILD) {
+						$this->architect->buildFloor($dungeon, $lowestOccupied->getActualDepth() + $count, $lowestOccupied->getRelativeDepth() + $count);
+						$count++;
+					}
+				}
+			}
 		}
+		/*
+		 * Clearing the doctrine cache and starting fresh, reloading everything to ensure we are looking at the right stuff.
+		 */
+		$floors = $this->em->createQuery('SELECT f FROM App:Floor f WHERE f.dungeon = :dungeon ORDER BY f.actualDepth DESC')->setParameters(['dungeon' => $dungeon])->getResult();
 
 		# Spawner loop, commence!
 		foreach ($floors as $floor) {
@@ -82,14 +92,18 @@ class DungeonMaster {
 		$roomCount = $rooms->count();
 		$popRate = $floor->getPopRate();
 		if (!$popRate) {
-			$popRate = $roomCount*self::BASEPOPRATE;
+			$popRate = $roomCount * self::BASEPOPRATE;
 			$floor->setPopRate($popRate);
 		}
 		$monsters = $floor->getMonsters()->count();
 		$spawners = $floor->fetchSpawnableRooms();
-		$currentRate = $monsters/$popRate;
+		if ($monsters === 0 || $spawners === 0) {
+			$currentRate = 0;
+		} else {
+			$currentRate = $monsters / $popRate;
+		}
 		while ($currentRate < $popRate) {
-			$monster = $this->spawnMob($floor->getActualDepth());
+			$monster = $this->spawnMob($floor);
 			$where = $this->findMonsterSpawnRoom($monster, $spawners);
 			if ($where) {
 				$monster->setRoom($where);
@@ -100,7 +114,8 @@ class DungeonMaster {
 
 	/**
 	 * Returns a room from a collection of rooms that a particular monster can spawn in.
-	 * @param Monster         $monster
+	 *
+	 * @param Monster $monster
 	 * @param ArrayCollection $rooms
 	 *
 	 * @return Room|false
@@ -123,7 +138,7 @@ class DungeonMaster {
 			}
 			$count++;
 		}
-		$max = $random*2;
+		$max = $random * 2;
 		foreach ($rooms as $room) {
 			if ($count > $max) {
 				break;
@@ -138,6 +153,7 @@ class DungeonMaster {
 	/**
 	 * Validates that the room selected for a monster is valid for that monster.
 	 * Returns true/false.
+	 *
 	 * @param Monster $monster
 	 * @param Room    $room
 	 *
@@ -148,48 +164,55 @@ class DungeonMaster {
 		return true;
 	}
 
-	public function characterAttackMob(Character $char, Monster $target) : void {
+	public function characterAttackMob(Character $char, Monster $target): void {
 		#TODO: Logic n stuff.
-        # roll for hit on mob
-        # if success && mob == neutral
-        # then set room agro (??)
-        # if success, roll for DMG
-        # set rolled DMG multiplier(???)
-        # calculate damage based on player stats
-        #
-        # apply DMG to Mob (account for resistances?)
-        # if Mob health < 0
-        # set Mob = dead
-        #
+		# roll for hit on mob
+		# if success && mob == neutral
+		# then set room agro (??)
+		# if success, roll for DMG
+		# set rolled DMG multiplier(???)
+		# calculate damage based on player stats
+		#
+		# apply DMG to Mob (account for resistances?)
+		# if Mob health < 0
+		# set Mob = dead
+		#
 	}
 
-    public function mobAttackCharacter(Monster $mob, Character $target) : void {
-        #TODO: implement logic
-        # roll for hit on player
-        #
-        # if success, roll for DMG
-        # set multiplier(???)
-        # calculate damage based on mob stats
-        #
-        # apply DMG to character (account for resistances?)
-        # if Player health < 0
-        # kill/respawn player(???)
-        # kick out of dungoen(???)
-        # ?????????
-    }
+	public function mobAttackCharacter(Monster $mob, Character $target): void {
+		#TODO: implement logic
+		# roll for hit on player
+		#
+		# if success, roll for DMG
+		# set multiplier(???)
+		# calculate damage based on mob stats
+		#
+		# apply DMG to character (account for resistances?)
+		# if Player health < 0
+		# kill/respawn player(???)
+		# kick out of dungoen(???)
+		# ?????????
+	}
 
-    public function spawnMob(int $depth, array $floorTypes = [], array $roomTypes = []) : Monster {
-        $monster = new Monster;
-        #
-        #TODO: logic
-        #
-        #if $mobType == null or empty
-        #roll for random mob
-        #
-        #calculate and set mob health
-        #
-        return $monster;
-    }
+	public function spawnMob(Floor $floor): Monster {
+		$monster = new Monster;
+		$this->em->persist($monster);
+		$monster->setType($this->pickMonsterType($floor));
+
+		#
+		#TODO: logic
+		#
+		#if $mobType == null or empty
+		#roll for random mob
+		#
+		#calculate and set mob health
+		#
+		return $monster;
+	}
+
+	public function pickMonsterType($floor): MonsterType {
+
+	}
 
 	public function calculateEnergyCost(Character $char, string $action) {
 		switch ($action) {
@@ -197,7 +220,7 @@ class DungeonMaster {
 				$skill = $this->fetchSkill($char, 'dungeoneering');
 				# 10000 is the highest skill we'll worry about, so subtract the evaluated skill from that, then divide by 10000.
 				# This reduces it to a 5th place decimal: 0.#####.
-				$cost = (100000-$skill->evaluate())/100000;
+				$cost = (100000 - $skill->evaluate()) / 100000;
 				# Return the result of lower value of 1 and the result higher value of $cost and 0.1.
 				# This ensures the cost never goes below 0.1, but never costs more than 1.
 				return min(1, max($cost, 0.1));
@@ -229,7 +252,7 @@ class DungeonMaster {
 	}
 
 	public function findSkillTypeByName(string $name): SkillType|false {
-		return $this->em->getRepository(SkillType::class)->findOneBy(['name'=>$name])?:false;
+		return $this->em->getRepository(SkillType::class)->findOneBy(['name' => $name]) ?: false;
 	}
 
 	public function moveCharacter(Character $char, Transit $where): void {
@@ -237,11 +260,11 @@ class DungeonMaster {
 		$newRoom = $where->getToRoom();
 		$char->setRoom($newRoom);
 		$char->setLastRoom($oldRoom);
-		$newRoom->setVisits($newRoom->getVisits()+1);
-		$where->setTransits($where->getTransits()+1);
-		$char->setEnergy($char->getEnergy()-$this->calculateEnergyCost($char, 'move'));
+		$newRoom->setVisits($newRoom->getVisits() + 1);
+		$where->setTransits($where->getTransits() + 1);
+		$char->setEnergy($char->getEnergy() - $this->calculateEnergyCost($char, 'move'));
 		$trained = $this->trainSkill($char, $this->findSkillTypeByName('dungeoneering'), 1);
-		$trained?:$this->em->flush();
+		$trained ?: $this->em->flush();
 	}
 
 	public function newSkill(Character $char, SkillType $type): Skill {
@@ -259,12 +282,15 @@ class DungeonMaster {
 		return $skill;
 	}
 
-	public function trainSkill(Character $char, SkillType $type=null, $pract = 0, $theory = 0): bool {
+	public function trainSkill(Character $char, SkillType $type = null, $pract = 0, $theory = 0): bool {
 		if (!$type) {
 			# Not all weapons have skills, this just catches those.
 			return false;
 		}
-		$query = $this->em->createQuery('SELECT s FROM App:Skill s WHERE s.character = :me AND s.type = :type ORDER BY s.id ASC')->setParameters(['me'=>$char, 'type'=>$type])->setMaxResults(1);
+		$query = $this->em->createQuery('SELECT s FROM App:Skill s WHERE s.character = :me AND s.type = :type ORDER BY s.id ASC')->setParameters([
+			'me' => $char,
+			'type' => $type,
+		])->setMaxResults(1);
 		$training = $query->getResult();
 		if ($pract && $pract < 1) {
 			$pract = 1;
@@ -289,7 +315,7 @@ class DungeonMaster {
 			$training->setTheoryHigh($theory);
 		} else {
 			$training = $training[0];
-			echo 'updating skill '.$training->getId().' - ';
+			echo 'updating skill ' . $training->getId() . ' - ';
 			if ($pract) {
 				$newPract = $training->getPractice() + $pract;
 				$training->setPractice($newPract);
@@ -309,5 +335,4 @@ class DungeonMaster {
 		$this->em->flush();
 		return true;
 	}
-
 }
