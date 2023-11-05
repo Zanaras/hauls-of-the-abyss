@@ -61,6 +61,19 @@ class DungeonController extends AbstractController {
 		}
 		$start = $this->em->getRepository(Room::class)->findOneBy(['dungeonExit'=>true]);
 		$char->setRoom($start);
+		$start->setVisits($start->getVisits()+1);
+		$this->em->flush();
+		return $this->redirectToRoute('dungeon_status');
+	}
+
+	#[Route('/dungeon/exit',name: 'dungeon_exit')]
+	public function dungeonExit(): RedirectResponse {
+		$char = $this->gk->gateway('dungeon_exit');
+		if ($char instanceof GuideKeeper) {
+			$this->addFlash('error', $this->trans->trans($char->getReason(), [], 'gatekeeper'));
+			return $this->redirectToRoute($char->getRoute());
+		}
+		$char->setRoom(null);
 		$this->em->flush();
 		return $this->redirectToRoute('dungeon_status');
 	}
@@ -73,7 +86,10 @@ class DungeonController extends AbstractController {
 			return $this->redirectToRoute($char->getRoute());
 		}
 		# If we don't have an error, this is a legitimate move.
+		$oldRoom = $char->getRoom();
 		$this->dm->moveCharacter($char, $transit);
+		$fromDir = $transit->getToRoom()->findFromDirection($oldRoom, true);
+		$this->addFlash('notice', "You enter the room from the $fromDir.");
 		return $this->redirectToRoute('dungeon_status');
 	}
 

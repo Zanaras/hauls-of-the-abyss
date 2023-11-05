@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
+
 class Transit {
 	private ?string $transits = null;
 	private ?int $id = null;
@@ -12,64 +14,64 @@ class Transit {
 	private ?string $direction = null;
 
 	public function getTransits(): ?string {
-		return $this->transits;
-	}
+   		return $this->transits;
+   	}
 
 	public function setTransits(string $transits): static {
-		$this->transits = $transits;
-
-		return $this;
-	}
+   		$this->transits = $transits;
+   
+   		return $this;
+   	}
 
 	public function getId(): ?int {
-		return $this->id;
-	}
+   		return $this->id;
+   	}
 
 	public function getDungeon(): ?Dungeon {
-		return $this->dungeon;
-	}
+   		return $this->dungeon;
+   	}
 
 	public function setDungeon(?Dungeon $dungeon): static {
-		$this->dungeon = $dungeon;
-
-		return $this;
-	}
+   		$this->dungeon = $dungeon;
+   
+   		return $this;
+   	}
 
 	public function getType(): ?TransitType {
-		return $this->type;
-	}
+   		return $this->type;
+   	}
 
 	public function setType(?TransitType $type): static {
-		$this->type = $type;
-
-		return $this;
-	}
+   		$this->type = $type;
+   
+   		return $this;
+   	}
 
 	public function getFromRoom(): ?Room {
-		return $this->fromRoom;
-	}
+   		return $this->fromRoom;
+   	}
 
 	public function setFromRoom(?Room $fromRoom): static {
-		$this->fromRoom = $fromRoom;
-		return $this;
-	}
+   		$this->fromRoom = $fromRoom;
+   		return $this;
+   	}
 
 	public function getToRoom(): ?Room {
-		return $this->toRoom;
-	}
+   		return $this->toRoom;
+   	}
 
 	public function setToRoom(?Room $toRoom): static {
-		$this->toRoom = $toRoom;
-		return $this;
-	}
+   		$this->toRoom = $toRoom;
+   		return $this;
+   	}
 
 	public function getDirection(): ?string {
-		return $this->direction;
-	}
+   		return $this->direction;
+   	}
 
 	public function setDirection($direction): static {
-		$this->direction = $direction;
-
-		return $this;
-	}
+   		$this->direction = $direction;
+   
+   		return $this;
+   	}
 }

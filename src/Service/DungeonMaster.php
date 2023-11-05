@@ -24,6 +24,7 @@ class DungeonMaster {
 	const POPDEPTHMIN = 0.69;
 	const POPDEPTHMAX = 2.71;
 	const BASEENERGY = 300;
+	const BASEHEALTH = 100;
 
 	public function __construct(Architect $architect, EntityManagerInterface $em, TranslatorInterface $trans) {
 		$this->architect = $architect;
@@ -31,8 +32,35 @@ class DungeonMaster {
 		$this->trans = $trans;
 	}
 
-	public function calculateMaxEnergy(Character $char): float {
-		return (float)self::BASEENERGY * $char->getRace()->getEndurance();
+	public function calculateMaxEnergy(Monster|Character $thing, Floor $floor = null): float {
+		$mod = match ($thing->getRace()->getSize()) {
+			'tiny' => 1.5,
+			'small' => 1.25,
+			'large' => 0.75,
+			'huge' => 0.5,
+			default => 1,
+		};
+		if ($floor) {
+			$fMod = min($floor->getActualDepth()/10, 1);
+		} else {
+			$fMod = 1;
+		}
+		return (float)self::BASEENERGY * $thing->getRace()->getEndurance();
+	}
+	public function calculateMaxHealth(Monster|Character $thing, Floor $floor = null): float {
+		$mod = match ($thing->getRace()->getSize()) {
+			'tiny' => 0.5,
+			'small' => 0.75,
+			'large' => 1.25,
+			'huge' => 1.5,
+			default => 1,
+		};
+		if ($floor) {
+			$fMod = min($floor->getActualDepth()/10, 1);
+		} else {
+			$fMod = 1;
+		}
+		return (float)self::BASEHEALTH * $thing->getRace()->getConstitution()*$mod*$fMod;
 	}
 
 	public function checkDungeon(Dungeon $dungeon): void {
@@ -78,12 +106,16 @@ class DungeonMaster {
 		/*
 		 * Clearing the doctrine cache and starting fresh, reloading everything to ensure we are looking at the right stuff.
 		 */
+		/*
+		TODO: Finish the rest of this.
+
 		$floors = $this->em->createQuery('SELECT f FROM App:Floor f WHERE f.dungeon = :dungeon ORDER BY f.actualDepth DESC')->setParameters(['dungeon' => $dungeon])->getResult();
 
 		# Spawner loop, commence!
 		foreach ($floors as $floor) {
 			$this->checkFloor($floor);
 		}
+		*/
 
 	}
 
@@ -197,8 +229,9 @@ class DungeonMaster {
 	public function spawnMob(Floor $floor): Monster {
 		$monster = new Monster;
 		$this->em->persist($monster);
-		$monster->setType($this->pickMonsterType($floor));
-
+		$monster->setRace($this->pickMonsterType($floor));
+		$monster->setPlayerKills(0);
+		$monster->setHealth($this->calculateMaxHealth($monster));
 		#
 		#TODO: logic
 		#
@@ -263,8 +296,8 @@ class DungeonMaster {
 		$newRoom->setVisits($newRoom->getVisits() + 1);
 		$where->setTransits($where->getTransits() + 1);
 		$char->setEnergy($char->getEnergy() - $this->calculateEnergyCost($char, 'move'));
-		$trained = $this->trainSkill($char, $this->findSkillTypeByName('dungeoneering'), 1);
-		$trained ?: $this->em->flush();
+		$this->trainSkill($char, $this->findSkillTypeByName('dungeoneering'), 1);
+		$this->em->flush();
 	}
 
 	public function newSkill(Character $char, SkillType $type): Skill {
