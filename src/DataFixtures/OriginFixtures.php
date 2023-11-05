@@ -4,10 +4,12 @@ namespace App\DataFixtures;
 
 use App\Entity\Origin;
 use App\Entity\OriginSkill;
+use App\Entity\SkillType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class OriginFixtures extends Fixture {
+class OriginFixtures extends Fixture implements DependentFixtureInterface {
 
 	private array $origins = [
 		'earthDeath' => [
@@ -31,7 +33,6 @@ class OriginFixtures extends Fixture {
 			]
 		],
 		'mafDeath' => [
-			'public' => false,
 			'unlock' => 'maf',
 			'skills' => [
 				'short sword' => 1.1,
@@ -46,7 +47,6 @@ class OriginFixtures extends Fixture {
 			],
 		],
 		'mafPortal' => [
-			'public' => false,
 			'unlock' => 'maf',
 			'skills' => [
 				'short sword' => 1.1,
@@ -61,7 +61,6 @@ class OriginFixtures extends Fixture {
 			],
 		],
 		'bmDeath' => [
-			'public' => false,
 			'unlock' => 'bm',
 			'skills' => [
 				'short sword' => 1.1,
@@ -74,7 +73,6 @@ class OriginFixtures extends Fixture {
 			],
 		],
 		'bmPortal' => [
-			'public' => false,
 			'unlock' => 'bm',
 			'skills' => [
 				'short sword' => 1.2,
@@ -108,45 +106,50 @@ class OriginFixtures extends Fixture {
 	];
 
 	public function load(ObjectManager $manager): void {
-		echo 'Loading Origins...';
+		echo "Loading Origins...\n";
 		foreach ($this->origins as $name => $data) {
-			$origin = $manager->getRepository('App:Origin')->findOneBy(['name'=>$name]);
-			echo 'Loading '.$name.' data...';
+			$origin = $manager->getRepository(Origin::class)->findOneBy(['name'=>$name]);
+			echo "Loading $name data...\n";
 			if (!$origin) {
-				echo 'Origin not found. Creating...';
+				echo "Origin not found. Creating...\n";
 				$origin = new Origin;
 				$manager->persist($origin);
 				$origin->setName($name);
 			}
-			$origin->setUnlock($data['unlock']);
+			if (array_key_exists('unlock', $data)) {
+				$origin->setUnlock($data['unlock']);
+				$origin->setPublic(false);
+			} else {
+				$origin->setPublic(true);
+			}
 			$manager->flush();
-			echo 'Updating existing skills...';
+			echo "Updating existing skills...\n";
 			foreach ($origin->getSkills() as $skill) {
 				$found = false;
 				$name = $skill->getSkill()->getName();
-				echo 'Looking for updated data for '.$name.'...';
+				echo "Looking for updated data for '$name'...\n";
 				foreach ($data['skills'] as $sName => $sData) {
 					if ($name === $sName) {
-						echo 'Data found. Updating...';
+						echo "Data found. Updating...\n";
 						$found = true;
 						$skill->setMod($sData);
 						unset($data['skills'][$sName]);
 					}
 				}
 				if (!$found) {
-					echo 'Data not found. Removing skill...';
+					echo "Data not found. Removing skill...\n";
 					$manager->remove($skill);
 				}
 			}
 			$manager->flush();
-			echo 'Associating new skills...';
+			echo "Associating new skills...\n";
 			foreach ($data['skills'] as $sName => $sData) {
-				echo 'Adding data for '.$sName.'...';
-				$skillType = $manager->getRepository('App:SkillType')->findOneBy(['name'=>$sName]);
+				echo "Adding data for $sName...\n";
+				$skillType = $manager->getRepository(SkillType::class)->findOneBy(['name'=>$sName]);
 				if (!$skillType) {
-					echo 'SkillType for '.$sName.' not found... skipping...';
+					echo "SkillType for '$sName' not found... skipping... \n";
 				} else {
-					echo 'Matching SkillType located. Adding Origin association...';
+					echo "Matching SkillType located. Adding Origin association...\n";
 					$oSkill = new OriginSkill();
 					$manager->persist($oSkill);
 					$oSkill->setSkill($skillType);
@@ -156,6 +159,7 @@ class OriginFixtures extends Fixture {
 			$manager->flush();
 		}
 	}
+
 	public function getDependencies(): array {
 		return [
 			SkillFixtures::class,

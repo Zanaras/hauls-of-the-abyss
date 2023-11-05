@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Service\AppState;
+use App\Service\Architect;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class PublicController extends AbstractController {
 	#[Route('/', name: 'public_index')]
-	public function index(EntityManagerInterface $em): Response {
+	public function index(EntityManagerInterface $em, Architect $arch): Response {
 		$query = $em->createQuery('SELECT j, c from App:Journal j JOIN j.character c WHERE j.public = true AND j.graphic = false AND j.pending_review = false AND j.GM_private = false AND j.GM_graphic = false ORDER BY j.date DESC')->setMaxResults(3);
 		$journals = $query->getResult();
 		if ($this->getUser()) {

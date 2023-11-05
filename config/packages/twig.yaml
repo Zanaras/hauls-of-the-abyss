@@ -1,9 +1,10 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
     globals:
-        site_name: '%env(SITE_NAME)%'
-        site_short: '%env(SITE_SHORT)%'
+        SITE_NAME: '%env(SITE_NAME)%'
+        SITE_SHORT: '%env(SITE_SHORT)%'
         appState: '@App\Service\AppState'
+        RECAPTCHA_SITE_KEY: '%env(RECAPTCHA_SITE_KEY)%'
 
 when@test:
     twig:

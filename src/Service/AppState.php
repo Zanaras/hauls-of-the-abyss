@@ -7,6 +7,7 @@ use App\Entity\Character;
 use App\Entity\GuideKeeper;
 use App\Entity\NetExit;
 use App\Entity\Origin;
+use App\Entity\Race;
 use App\Entity\SecurityLog;
 use App\Entity\User;
 use App\Entity\UserLog;
@@ -295,6 +296,10 @@ class AppState {
 			$all->add($each->getOrigin());
 		}
 		return $all;
+	}
+
+	public function findAvailableRaces() {
+		return $this->em->getRepository(Race::class)->findAll();
 	}
 
 	public function checkCharacterLimit(User $user): array {

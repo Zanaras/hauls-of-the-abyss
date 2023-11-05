@@ -15,96 +15,96 @@ class RoomType {
 	private ?int $minDepth = null;
 
 	public function getName(): ?string {
-   		return $this->name;
-   	}
+		return $this->name;
+	}
 
 	public function setName(string $name): static {
-   		$this->name = $name;
-   
-   		return $this;
-   	}
+		$this->name = $name;
+
+		return $this;
+	}
 
 	public function getModifiers(): array {
-   		return $this->modifiers;
-   	}
+		return $this->modifiers;
+	}
 
 	public function setModifiers(array $modifiers): static {
-   		$this->modifiers = $modifiers;
-   
-   		return $this;
-   	}
+		$this->modifiers = $modifiers;
+
+		return $this;
+	}
 
 	public function getId(): ?int {
-   		return $this->id;
-   	}
+		return $this->id;
+	}
 
 	public function getSpawn(): ?bool {
-   		return $this->spawn;
-   	}
+		return $this->spawn;
+	}
 
 	public function setSpawn(bool $spawn): static {
-   		$this->spawn = $spawn;
-   
-   		return $this;
-   	}
+		$this->spawn = $spawn;
+
+		return $this;
+	}
 
 	public function isTeleporter(): ?bool {
-   		return $this->teleporter;
-   	}
+		return $this->teleporter;
+	}
 
 	public function setTeleporter(bool $teleporter): static {
-   		$this->teleporter = $teleporter;
-   
-   		return $this;
-   	}
+		$this->teleporter = $teleporter;
+
+		return $this;
+	}
 
 	public function isPortal(): ?bool {
-   		return $this->portal;
-   	}
+		return $this->portal;
+	}
 
 	public function setPortal(bool $portal): static {
-   		$this->portal = $portal;
-   
-   		return $this;
-   	}
+		$this->portal = $portal;
+
+		return $this;
+	}
 
 	public function isAllowUp(): ?bool {
-   		return $this->allowUp;
-   	}
+		return $this->allowUp;
+	}
 
 	public function setAllowUp(bool $allowUp): static {
-   		$this->allowUp = $allowUp;
-   
-   		return $this;
-   	}
+		$this->allowUp = $allowUp;
+
+		return $this;
+	}
 
 	public function isAllowDown(): ?bool {
-   		return $this->allowDown;
-   	}
+		return $this->allowDown;
+	}
 
 	public function setAllowDown(bool $allowDown): static {
-   		$this->allowDown = $allowDown;
-   
-   		return $this;
-   	}
+		$this->allowDown = $allowDown;
+
+		return $this;
+	}
 
 	public function getAlternate(): ?string {
-   		return $this->alternate;
-   	}
+		return $this->alternate;
+	}
 
 	public function setAlternate(?string $alternate): static {
-   		$this->alternate = $alternate;
-   
-   		return $this;
-   	}
+		$this->alternate = $alternate;
+
+		return $this;
+	}
 
 	public function getMinDepth(): ?int {
-   		return $this->minDepth;
-   	}
+		return $this->minDepth;
+	}
 
 	public function setMinDepth(int $minDepth): static {
-   		$this->minDepth = $minDepth;
-   
-   		return $this;
-   	}
+		$this->minDepth = $minDepth;
+
+		return $this;
+	}
 }

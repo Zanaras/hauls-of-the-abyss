@@ -31,12 +31,12 @@ class RaceFixtures extends Fixture {
 	];
 
 	public function load(ObjectManager $manager): void {
-		echo 'Loading Races...';
+		echo "Loading Races...\n";
 		foreach ($this->races as $name=>$data) {
-			echo '... Hello '.$name.' race!';
-			$race = $manager->getRepository('App:Race')->findOneBy(['name'=>$name]);
+			echo "... Hello $name race!\n";
+			$race = $manager->getRepository(Race::class)->findOneBy(['name'=>$name]);
 			if (!$race) {
-				echo 'New race detected. Adding!';
+				echo "New race detected. Adding!\n";
 				$race = new Race();
 				$manager->persist($race);
 				$race->setName($name);

@@ -8,10 +8,9 @@ class MonsterType {
 	private ?string $name = null;
 	private ?string $size = null;
 	private ?bool $neutral = null;
-	private ?bool $alive = null;
 	private ?string $image = null;
 	private ?string $imageDead = null;
-	private array $attackType = [];
+	private array $attackTypes = [];
 	private ?int $id = null;
 
 	public function getName(): ?string {
@@ -34,22 +33,12 @@ class MonsterType {
    		return $this;
    	}
 
-	public function isNeutral(): ?bool {
+	public function getNeutral(): ?bool {
    		return $this->neutral;
    	}
 
 	public function setNeutral(bool $neutral): static {
    		$this->neutral = $neutral;
-   
-   		return $this;
-   	}
-
-	public function isAlive(): ?bool {
-   		return $this->alive;
-   	}
-
-	public function setAlive(bool $alive): static {
-   		$this->alive = $alive;
    
    		return $this;
    	}
@@ -74,17 +63,17 @@ class MonsterType {
    		return $this;
    	}
 
-	public function getAttackType(): array {
-   		return $this->attackType;
-   	}
-
-	public function setAttackType(array $attackType): static {
-   		$this->attackType = $attackType;
-   
-   		return $this;
-   	}
-
 	public function getId(): ?int {
    		return $this->id;
    	}
+
+	public function getAttackTypes(): array {
+		return $this->attackTypes;
+	}
+
+	public function setAttackTypes(array $attackTypes): static {
+		$this->attackTypes = $attackTypes;
+
+		return $this;
+	}
 }

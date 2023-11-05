@@ -23,18 +23,30 @@ security:
                 enable_csrf: true
             logout:
                 path: user_logout
-                # where to redirect after logout
-                # target: app_any_route
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 7776000
+            switch_user: true
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+    role_hierarchy:
+        ROLE_TESTER:            ROLE USER
+        ROLE_DUNGEON_MASTER:    ROLE USER
+        ROLE_ADMIN:             [ROLE_USER, ROLE_TESTER, ROLE_DUNGEON_MASTER]
+        ROLE_SUPER_ADMIN:       [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/(../)?user/(register|login|reset|verify)?$, roles: PUBLIC_ACCESS }
+        - { path: ^/(../)?user, roles: IS_AUTHENTICATED }
+        - { path: ^/(../)?play, roles: IS_AUTHENTICATED }
+        - { path: ^/(../)?town, roles: IS_AUTHENTICATED }
+        - { path: ^/(../)?wilds, roles: IS_AUTHENTICATED }
+        - { path: ^/(../)?dungeon, roles: IS_AUTHENTICATED }
+        - { path: ^/(../)?journal/[0-9]+, roles: PUBLIC_ACCESS }
+        - { path: ^/(../)?journal/user, roles: PUBLIC_ACCESS }
+        - { path: ^/(../)?journal, roles: IS_AUTHENTICATED }
+        - { path: ^/(../)?gm, roles: ROLE_OLYMPUS }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 

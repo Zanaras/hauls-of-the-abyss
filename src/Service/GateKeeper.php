@@ -16,6 +16,18 @@ class GateKeeper {
 	const TOWN = AppState::TOWN;
 	const DUNGEON = AppState::DUNGEON;
 	const WILDS = AppState::WILDS;
+	const DIRECTIONS = [
+		'N'=>'North',
+		'NE'=>'North East',
+		'E'=>'East',
+		'SE'=>'South East',
+		'S'=>'South',
+		'SW'=>'South West',
+		'W'=>'West',
+		'NW'=>'North West',
+		'U'=>'Up a Floor',
+		'D'=>'Down a Floor',
+	];
 	private AppState $app;
 
 	public function __construct(AppState $app) {
@@ -34,11 +46,11 @@ class GateKeeper {
 	 * @return GuideKeeper|Character
 	 */
 	public function gateway(string $route, array $slugs = [], array $opts = ['list'=>true], bool $flush = true): GuideKeeper|Character {
-		$char = $this->app->security($route, $slugs, false, $flush);
-		if ($char instanceof GuideKeeper) {
-			return $char;
+		$user = $this->app->security($route, $slugs, false, $flush);
+		if ($user instanceof GuideKeeper) {
+			return $user;
 		}
-		$char = $this->checkAreaCode($char, $route);
+		$char = $this->checkAreaCode($user->getCurrentCharacter(), $route);
 		if ($char instanceof GuideKeeper) {
 			return $char;
 		}
@@ -122,12 +134,13 @@ class GateKeeper {
 	 * @param string $title
 	 * @param string $route
 	 *
-	 * @return string[]
+	 * @return array
 	 */
-	private function pass(string $title, string $route): array {
+	private function pass(string $title, string $route, array $params=[]): array {
 		return [
-			'title' => $title,
+			'name' => $title,
 			'url' => $route,
+			'parameters'=>[],
 		];
 	}
 
@@ -137,11 +150,11 @@ class GateKeeper {
 	 * @param string $title
 	 * @param string $error
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	private function fail(string $title, string $error): array {
 		return [
-			'title' => $title,
+			'name' => $title,
 			'description' => $error,
 		];
 	}
@@ -159,6 +172,14 @@ class GateKeeper {
 
 	public function dungeonNav(Character $char, array $opts = []): array {
 		$options = [];
+		$options[] = $this->dungeon_status_test($char);
+		$options[] = $this->dungeon_enter_test($char);
+		$options[] = $this->dungeon_retreat_test($char);
+		if ($room = $char->getRoom()) {
+			foreach ($room->getExits() as $exit) {
+				$options[] = $this->dungeon_move_test($char, 'dungeon_move', ['dir'=>$exit->getDirection(), 'transit'=>$exit]);
+			}
+		}
 		return $options;
 	}
 
@@ -179,10 +200,10 @@ class GateKeeper {
 	 * @param Character $char
 	 * @param string    $route
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	private function dungeon_status_test(Character $char, string $route = 'dungeon_status'): array {
-		$title = 'Enter the Abyss';
+		$title = 'Character Status';
 		if ($char->getAreaCode() === self::MU) {
 			return $this->fail($title, 'generic.notstarted');
 		}
@@ -192,6 +213,43 @@ class GateKeeper {
 		return $this->pass($title, $route);
 	}
 
+	private function dungeon_enter_test(Character $char, string $route = 'dungeon_enter'): array {
+		$title = 'Enter the Abyss';
+		if ($char->getAreaCode() === self::MU) {
+			return $this->fail($title, 'generic.notstarted');
+		}
+		if ($char->getAreaCode() === self::DUNGEON && $char->getRoom()) {
+			return $this->fail($title, 'dungeon.alreadyin');
+		}
+		return $this->pass($title, $route);
+	}
+
+	private function dungeon_move_test(Character $char, string $route = 'dungeon_move', array $opts = []): array {
+		if (array_key_exists('dir', $opts)) {
+			$title = 'Move '.self::DIRECTIONS[$opts['dir']];
+		} else {
+			$title = 'Move to a Room';
+		}
+		if ($char->getAreaCode() === self::MU) {
+			return $this->fail($title, 'generic.notstarted');
+		}
+		if ($char->getAreaCode() !== self::DUNGEON) {
+			return $this->fail($title, 'generic.notindungeon');
+		}
+		$room = $char->getRoom();
+		if (!$room) {
+			return $this->fail($title, 'dungeon.notexploring');
+		}
+		if (!array_key_exists('transit', $opts)) {
+			return $this->fail($title, 'dungeon.notransitgiven');
+		}
+		if (!$room->getExits()->contains($opts['transit'])) {
+			return $this->fail($title, 'dungeon.notvalidtransit');
+		}
+		return $this->pass($title, $route, [
+			'transit'=>$opts['transit']->getId()
+		]);
+	}
 
 	private function dungeon_retreat_test(Character $char, string $route = 'dungeon_status', $opts = ['list'=>false]): array {
 		$title = 'Retreat from the Room';
@@ -224,10 +282,10 @@ class GateKeeper {
 	 * @param Character $char
 	 * @param string    $route
 	 *
-	 * @return string[]
+	 * @return array
 	 */
-	private function town_status_test(Character $char, string $route = 'town_status'): array {
-		$title = 'Go To Town';
+	private function town_status_test(Character $char, string $route = 'town_status', $opts=[]): array {
+		$title = 'Character Status';
 		if ($char->getAreaCode() === self::MU) {
 			return $this->fail($title, 'generic.notstarted');
 		}
@@ -239,10 +297,11 @@ class GateKeeper {
 
 	/**
 	 * Route security check for "town_to_dungeon".
+	 *
 	 * @param Character $char
 	 * @param string    $route
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	private function town_to_dungeon_test(Character $char, string $route = 'town_to_dungeon'): array {
 		$title = 'Enter the Abyss';

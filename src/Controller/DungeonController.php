@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\GuideKeeper;
+use App\Entity\Room;
 use App\Entity\Transit;
 use App\Service\DungeonMaster;
 use App\Service\GateKeeper;
@@ -51,6 +52,19 @@ class DungeonController extends AbstractController {
 		return $this->redirectToRoute('town_status');
 	}
 
+	#[Route('/dungeon/enter',name: 'dungeon_enter')]
+	public function dungeonEnter(): RedirectResponse {
+		$char = $this->gk->gateway('dungeon_enter');
+		if ($char instanceof GuideKeeper) {
+			$this->addFlash('error', $this->trans->trans($char->getReason(), [], 'gatekeeper'));
+			return $this->redirectToRoute($char->getRoute());
+		}
+		$start = $this->em->getRepository(Room::class)->findOneBy(['dungeonExit'=>true]);
+		$char->setRoom($start);
+		$this->em->flush();
+		return $this->redirectToRoute('dungeon_status');
+	}
+
 	#[Route('/move/{transit}', name: 'dungeon_move', requirements: ['trasnit'=>'\d+'])]
 	public function move(Transit $transit): Response {
 		$char = $this->gk->gateway('dungeon_move', ['transit'=>$transit->getId()], ['transit'=>$transit]);
@@ -65,7 +79,7 @@ class DungeonController extends AbstractController {
 
 	#[Route('/retreat', name: 'dungeon_retreat')]
 	public function retreat(): Response {
-		list($char, $transit) = $this->gk->gateway('dungeon_retreat');
+		[$char, $transit] = $this->gk->gateway('dungeon_retreat');
 		if ($char instanceof GuideKeeper) {
 			$this->addFlash('error', $this->trans->trans($char->getReason(), [], 'gatekeeper'));
 			return $this->redirectToRoute($char->getRoute());

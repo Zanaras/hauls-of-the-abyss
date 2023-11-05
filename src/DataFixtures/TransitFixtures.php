@@ -15,12 +15,12 @@ class TransitFixtures extends Fixture {
 	];
 
 	public function load(ObjectManager $manager): void {
-		echo 'Loading TransitTypes...';
+		echo "Loading TransitTypes...\n";
 		foreach ($this->types as $name=>$data) {
-			echo '... Hello '.$name.' race!';
-			$type = $manager->getRepository('App:TransitType')->findOneBy(['name'=>$name]);
+			echo "... Hello $name race!";
+			$type = $manager->getRepository(TransitType::class)->findOneBy(['name'=>$name]);
 			if (!$type) {
-				echo 'New race detected. Adding!';
+				echo "New race detected. Adding!\n";
 				$type = new TransitType();
 				$manager->persist($type);
 				$type->setName($name);

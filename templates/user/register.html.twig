@@ -2,12 +2,15 @@
 
 {% block title %}{% trans('user.register.title', [], 'user') %}{% endblock %}
 
+{% block bodyScripts %}
+    <script type="text/javascript" src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
+
 {% block body %}
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
 
     <h1>Register</h1>
-
-    {{ form(registrationForm) }}
+    {% include "parts/registration.html.twig" with {'form': registrationForm} %}
 {% endblock %}

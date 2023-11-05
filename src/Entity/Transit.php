@@ -51,7 +51,6 @@ class Transit {
 
 	public function setFromRoom(?Room $fromRoom): static {
 		$this->fromRoom = $fromRoom;
-
 		return $this;
 	}
 
@@ -61,7 +60,6 @@ class Transit {
 
 	public function setToRoom(?Room $toRoom): static {
 		$this->toRoom = $toRoom;
-
 		return $this;
 	}
 

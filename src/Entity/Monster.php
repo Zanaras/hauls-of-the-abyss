@@ -4,7 +4,7 @@ namespace App\Entity;
 
 class Monster {
 	private ?string $name = null;
-	private ?int $playerKills = null;
+	private int $playerKills = 0;
 	private ?string $size = null;
 	private ?float $constitution = null;
 	private ?float $spirit = null;
@@ -14,114 +14,142 @@ class Monster {
 	private ?Floor $floor = null;
 	private ?Room $room = null;
 	private ?Dungeon $dungeon = null;
+	private ?string $image = null;
+	private ?string $imageDead = null;
+	private array $attackTypes = [];
+	private ?bool $alive = true;
 
 	public function getName(): ?string {
-                  		return $this->name;
-                  	}
+		return $this->name;
+	}
 
 	public function setName(?string $name): static {
-                  		$this->name = $name;
-                  
-                  		return $this;
-                  	}
+		$this->name = $name;
+
+		return $this;
+	}
 
 	public function getPlayerKills(): ?int {
-                  		return $this->playerKills;
-                  	}
+		return $this->playerKills;
+	}
 
 	public function setPlayerKills(int $playerKills): static {
-                  		$this->playerKills = $playerKills;
-                  
-                  		return $this;
-                  	}
+		$this->playerKills = $playerKills;
+
+		return $this;
+	}
 
 	public function getSize(): ?string {
-                  		return $this->size;
-                  	}
+		return $this->size;
+	}
 
 	public function setSize(string $size): static {
-                  		$this->size = $size;
-                  
-                  		return $this;
-                  	}
+		$this->size = $size;
+
+		return $this;
+	}
 
 	public function getConstitution(): ?float {
-                  		return $this->constitution;
-                  	}
+		return $this->constitution;
+	}
 
 	public function setConstitution(float $constitution): static {
-                  		$this->constitution = $constitution;
-                  
-                  		return $this;
-                  	}
+		$this->constitution = $constitution;
+
+		return $this;
+	}
 
 	public function getSpirit(): ?float {
-                  		return $this->spirit;
-                  	}
+		return $this->spirit;
+	}
 
 	public function setSpirit(float $spirit): static {
-                  		$this->spirit = $spirit;
-                  
-                  		return $this;
-                  	}
+		$this->spirit = $spirit;
+
+		return $this;
+	}
 
 	public function getId(): ?int {
-                  		return $this->id;
-                  	}
+		return $this->id;
+	}
 
 	public function getType(): ?MonsterType {
-                  		return $this->type;
-                  	}
+		return $this->type;
+	}
 
 	public function setType(?MonsterType $type): static {
-                  		$this->type = $type;
-                  
-                  		return $this;
-                  	}
+		$this->type = $type;
+
+		return $this;
+	}
 
 	public function getHealth(): ?float {
-                  		return $this->health;
-                  	}
+		return $this->health;
+	}
 
 	public function setHealth(float $health): static {
-                  		$this->health = $health;
-                  
-                  		return $this;
-                  	}
+		$this->health = $health;
 
-    public function getDungeon(): ?Dungeon
-    {
-        return $this->dungeon;
-    }
+		return $this;
+	}
 
-    public function setDungeon(?Dungeon $dungeon): static
-    {
-        $this->dungeon = $dungeon;
+	public function getDungeon(): ?Dungeon {
+		return $this->dungeon;
+	}
 
-        return $this;
-    }
+	public function setDungeon(?Dungeon $dungeon): static {
+		$this->dungeon = $dungeon;
 
-    public function getFloor(): ?Floor
-    {
-        return $this->floor;
-    }
+		return $this;
+	}
 
-    public function setFloor(?Floor $floor): static
-    {
-        $this->floor = $floor;
+	public function getFloor(): ?Floor {
+		return $this->floor;
+	}
 
-        return $this;
-    }
+	public function setFloor(?Floor $floor): static {
+		$this->floor = $floor;
 
-    public function getRoom(): ?Room
-    {
-        return $this->room;
-    }
+		return $this;
+	}
 
-    public function setRoom(?Room $room): static
-    {
-        $this->room = $room;
+	public function getRoom(): ?Room {
+		return $this->room;
+	}
 
-        return $this;
-    }
+	public function setRoom(?Room $room): static {
+		$this->room = $room;
+
+		return $this;
+	}
+
+	public function getImage(): ?string {
+		return $this->image;
+	}
+
+	public function setImage(string $image): static {
+		$this->image = $image;
+
+		return $this;
+	}
+
+	public function getImageDead(): ?string {
+		return $this->imageDead;
+	}
+
+	public function setImageDead(string $image): static {
+		$this->imageDead = $image;
+
+		return $this;
+	}
+
+	public function getAlive(): bool {
+		return $this->alive;
+	}
+
+	public function setAlive(bool $alive): static {
+		$this->alive = $alive;
+
+		return $this;
+	}
 }

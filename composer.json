@@ -1,6 +1,6 @@
 {
     "type": "project",
-    "license": "proprietary",
+    "license": "CC BY-NC-SA 4.0",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
@@ -12,6 +12,7 @@
         "doctrine/doctrine-bundle": "^2.10",
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "doctrine/orm": "^2.16",
+        "google/recaptcha": "^1.3",
         "kagurati/torutils": "^0.2.0",
         "league/commonmark": "^2.4",
         "phpstan/phpdoc-parser": "^1.24",

@@ -22,6 +22,16 @@ class Room {
 	private ?Floor $leavesToFloor = null;
 	private ?Floor $entersToFloor = null;
 	private Collection $monsters;
+	private array $DIRECTIONS = [
+		1 => "N",
+		2 => "NE",
+		3 => "E",
+		4 => "SE",
+		5 => "S",
+		6 => "SW",
+		7 => "W",
+		8 => "NW",
+	];
 
 	public function __construct() {
 		$this->characters = new ArrayCollection();
@@ -31,36 +41,43 @@ class Room {
 	}
 
 	public function findAvailableDirection(): string|false {
-		$all = [
-			1 => "N",
-			2 => "NE",
-			3 => "E",
-			4 => "SE",
-			5 => "S",
-			6 => "SW",
-			7 => "W",
-			8 => "NW",
-		];
-		$max = 8;
-		foreach ($this->exits as $transit) {
-			foreach ($all as $key=>$opt) {
+		$all = $this->DIRECTIONS;
+		foreach ($this->exits as $exit) {
+			$dir = $exit->getDirection();
+			foreach ($all as $key => $opt) {
 				# Check if this transit's direction exists in the array above, remove it if it does.
-				if (in_array($transit>getDirection(), $all)) {
+				if (in_array($dir, $all)) {
 					unset($all[$key]);
-					$max--;
 					break; # Return to outer loop.
 				}
 			}
 		}
-		if ($max !== 1) {
+		$available = array_values($this->findAllAvailableDirections());
+		$max = count($available);
+		if ($max >= 1) {
 			# More than one left, return one at random.
-			return rand(1, $max);
+			return $available[rand(0, $max-1)];
 		} elseif ($max === 1) {
 			# Only one left, just return it.
-			return $all[array_key_last($all)];
+			return $available[array_key_last($available)];
 		}
 		# Shouldn't happen, but just in case.
 		return false;
+	}
+
+	public function findAllAvailableDirections(): array {
+		$all = $this->DIRECTIONS;
+		foreach ($this->exits as $exit) {
+			$dir = $exit->getDirection();
+			foreach ($all as $key => $opt) {
+				# Check if this transit's direction exists in the array above, remove it if it does.
+				if (in_array($dir, $all)) {
+					unset($all[$key]);
+					break; # Return to outer loop.
+				}
+			}
+		}
+		return $all;
 	}
 
 	public function getVisits(): ?string {
@@ -265,10 +282,22 @@ class Room {
 		return $this;
 	}
 
+	/**
+	 * Returns the floor that this one provides connection to.
+	 *
+	 * @return Floor|null
+	 */
 	public function getLeavesToFloor(): ?Floor {
 		return $this->leavesToFloor;
 	}
 
+	/**
+	 * Sets another floor other than the one this is on as a floor this room provides connection to.
+	 *
+	 * @param Floor|null $leavesToFloor
+	 *
+	 * @return $this
+	 */
 	public function setLeavesToFloor(?Floor $leavesToFloor): static {
 		$this->leavesToFloor = $leavesToFloor;
 

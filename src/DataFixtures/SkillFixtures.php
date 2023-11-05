@@ -54,6 +54,7 @@ class SkillFixtures extends Fixture {
 
 		"human anatomy" => ['cat' => 'humanoids'],
 		"goblin anatomy" => ['cat' => 'humanoids'],
+		"insectoid anatomy" => ['cat' => 'humanoids'],
 
 		"invocation" => ['cat' => 'magic'],
 		"inscription" => ['cat' => 'magic'],
@@ -130,37 +131,37 @@ class SkillFixtures extends Fixture {
 	];
 
 	public function load(ObjectManager $manager): void {
-		echo 'Loading Skill Categories...';
+		echo "Loading Skill Categories...\n";
 		foreach ($this->categories as $name => $data) {
-			$type = $manager->getRepository('App:SkillCategory')->findOneBy(['name' => $name]);
+			$type = $manager->getRepository(SkillCategory::class)->findOneBy(['name' => $name]);
 			if (!$type) {
 				$type = new SkillCategory();
 				$manager->persist($type);
 				$type->setName($name);
 			}
 			if ($data['pro'] != null) {
-				$pro = $manager->getRepository('App:SkillCategory')->findOneBy(['name' => $data['pro']]);
+				$pro = $manager->getRepository(SkillCategory::class)->findOneBy(['name' => $data['pro']]);
 				if ($pro) {
 					$type->setCategory($pro);
 				} else {
-					echo 'No Skill Category of name ' . $data['pro'] . ' found for ' . $name;
+					echo "No Skill Category of name " . $data['pro'] . " found for $name\n";
 				}
 			}
 			$manager->flush();
 		}
-		echo 'Loading Skill Types...';
+		echo "Loading Skill Types...";
 		foreach ($this->skills as $name => $data) {
-			$type = $manager->getRepository('App:SkillType')->findOneBy(['name' => $name]);
+			$type = $manager->getRepository(SkillType::class)->findOneBy(['name' => $name]);
 			if (!$type) {
 				$type = new SkillType();
 				$manager->persist($type);
 				$type->setName($name);
 			}
-			$cat = $manager->getRepository('App:SkillCategory')->findOneBy(['name' => $data['cat']]);
+			$cat = $manager->getRepository(SkillCategory::class)->findOneBy(['name' => $data['cat']]);
 			if ($cat) {
 				$type->setCategory($cat);
 			} else {
-				echo 'No Skill category of name ' . $data['cat'] . ' found for skill ' . $name . '\n';
+				echo "No Skill category of name " . $data['cat'] . " found for skill $name\n";
 			}
 		}
 		$manager->flush();

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Characters{% endblock %}
+
+{% block body %}
+    <div id="actionlist" class="boxlist">
+        {% set elements = {
+            0:{"name":"New Character", "url":"play_create_character", "description":"Start a new Journey into the Abyss"},
+        } %}
+        {% include "parts/linklist.html.twig" with {"list":{"elements":elements}, "domain":'messages'} only %}
+    </div>
+    <table class="leftmain">
+        <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Action</th>
+        </tr>
+        {% if characters.count > 0 %}
+            {% for char in characters %}
+                {% set started = true %}
+                <tr>
+                    <td>{{ char.name }}</td>
+                    <td>
+                        {% if char.areaCode == 0 %}
+                            {% set started = false %}
+                            Not Started
+                        {% elseif char.areaCode == 1 %}
+                            In Town
+                        {% elseif char.areaCode == 2 %}
+                            In the Abyss
+                        {% else %}
+                            In the Wilds
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if started %}
+                            <a href="{{ path('play_character', {'char':char.id}) }}">Play</a>
+                        {% else %}
+                            {# TODO: Allow users to restart char creation half-way. #}(Coming Soon...)
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td></td>
+                <td>
+                    <i>No one seems to be here yet...</i>
+                </td>
+                <td></td>
+            </tr>
+        {% endif %}
+    </table>
+{% endblock %}
