@@ -19,12 +19,15 @@ class DungeonMaster {
 	private Architect $architect;
 	private EntityManagerInterface $em;
 	private TranslatorInterface $trans;
-	const PREBUILD = 2;
-	const BASEPOPRATE = 0.85;
-	const POPDEPTHMIN = 0.69;
-	const POPDEPTHMAX = 2.71;
-	const BASEENERGY = 300;
-	const BASEHEALTH = 100;
+
+	#TODO: Rework these into AppSettings.
+	private int $prebuild = 1;
+	private float $basePopRate = 0.85;
+	private float $popDepthMin = 0.69;
+	private float $popDepthMax = 2.71;
+	private float $baseEnergy = 300;
+	private float $baseHealth = 100;
+
 
 	public function __construct(Architect $architect, EntityManagerInterface $em, TranslatorInterface $trans) {
 		$this->architect = $architect;
@@ -40,13 +43,15 @@ class DungeonMaster {
 			'huge' => 0.5,
 			default => 1,
 		};
-		if ($floor) {
-			$fMod = min($floor->getActualDepth()/10, 1);
-		} else {
-			$fMod = 1;
+
+		#TODO: Do we want deeper monster spawns to have more energy?
+		$fMod = 1;
+		if ($floor && $floor->getActualDepth() > 10) {
+			$fMod = $floor->getActualDepth()/10;
 		}
-		return (float)self::BASEENERGY * $thing->getRace()->getEndurance();
+		return $this->baseEnergy * $thing->getRace()->getEndurance() * $mod;
 	}
+
 	public function calculateMaxHealth(Monster|Character $thing, Floor $floor = null): float {
 		$mod = match ($thing->getRace()->getSize()) {
 			'tiny' => 0.5,
@@ -60,45 +65,55 @@ class DungeonMaster {
 		} else {
 			$fMod = 1;
 		}
-		return (float)self::BASEHEALTH * $thing->getRace()->getConstitution()*$mod*$fMod;
+		return $this->baseHealth * $thing->getRace()->getConstitution()*$mod*$fMod;
 	}
 
 	public function checkDungeon(Dungeon $dungeon): void {
 		$floors = $this->em->createQuery('SELECT f FROM App:Floor f WHERE f.dungeon = :dungeon ORDER BY f.actualDepth DESC')->setParameters(['dungeon' => $dungeon])->getResult();
 		$floorCount = $dungeon->getFloors()->count();
+		echo "$floorCount floors detected...\n";
 		$lowest = 0;
 		$lowestOccupied = null;
 
 		# Builder loop, commence!
 		if ($floorCount === 0) {
+			echo "Entered 0 floor code...\n";
 			$floors = [];
 			$count = 0;
-			while ($count < self::PREBUILD) {
+			while ($count < $this->prebuild) {
 				# Basically, build the PREBUILD number of floors.
 				$count++;
-				$floors[] = $this->architect->buildFloor($dungeon, $count, $count);
+				$this->architect->buildFloor($dungeon, $count, $count);
 			}
 		} else {
+			echo "Finding lowest occupied floor...\n";
 			foreach ($floors as $floor) {
 				if (!$lowest) {
-					# Yay PHP, 0 evalutates to false, so this only gets hit the first time.
 					$lowest = $floor->getActualDepth();
 				}
 				if ($floor->getVisits() < 1) {
 					# Don't care about empty floors.
 					continue;
 				} else {
-					$lowestOccupied = $floor;
+					if (!$lowestOccupied) {
+						# Yay PHP, 0 evalutates to false, so this only gets hit the first time.
+						$lowestOccupied = $floor;
+					}
 					break;
 				}
 			}
 			if ($lowestOccupied) {
+				$id = $lowestOccupied->getId();
+				$actual = $lowestOccupied->getActualDepth();
+				echo "Lowest floor is $id at depth $actual...\n";
 				$difference = $lowest - $lowestOccupied->getActualDepth();
-				$count = 1;
-				if ($difference < self::PREBUILD) {
-					while ($count < self::PREBUILD) {
-						$this->architect->buildFloor($dungeon, $lowestOccupied->getActualDepth() + $count, $lowestOccupied->getRelativeDepth() + $count);
+				echo "Lowest floor difference from occupied floor is $difference...\n";
+				$count = 0;
+				if ($difference < 1) {
+					while ($count < $this->prebuild) {
+						echo "Building a floor!\n";
 						$count++;
+						$this->architect->buildFloor($dungeon, $actual + $count, $lowestOccupied->getRelativeDepth() + $count);
 					}
 				}
 			}
@@ -124,7 +139,7 @@ class DungeonMaster {
 		$roomCount = $rooms->count();
 		$popRate = $floor->getPopRate();
 		if (!$popRate) {
-			$popRate = $roomCount * self::BASEPOPRATE;
+			$popRate = $roomCount * $this->basePopRate;
 			$floor->setPopRate($popRate);
 		}
 		$monsters = $floor->getMonsters()->count();

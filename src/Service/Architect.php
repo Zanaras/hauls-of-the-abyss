@@ -18,6 +18,10 @@ class Architect {
 	protected TranslatorInterface $trans;
 	private ?array $allRoomTypes = null;
 	private ?Room $foundPit = null;
+	public int $MAINPATHMAX; # Generated on the fly.
+	public int $SIDEPATHMAX; # Generated on the fly.
+
+	#TODO: Rework these into AppSettings.
 	public int $SPRAWL = 25;
 	public int $PEACEMOD = 25;
 	public int $TELEPORTMOD = 10;
@@ -27,6 +31,7 @@ class Architect {
 	# Most common rooms should be first, less common rooms later.
 	# These failover into the next item.
 	# Same with path counts.
+	#TODO: Rework these into AppSettings.
 	public array $ROOMCHANCES = [
 		'normal' => 100,
 		'stairs' => 105,
@@ -38,7 +43,7 @@ class Architect {
 		'deep pit'
 	];
 	public int $EXITCAP = 3;
-	public int $BYPASSCHANCE = 1;
+	public float $BYPASSPOWER = 0.3;
 	public array $MAINPATHCHANCES = [
 		2 => 100,
 		3 => 125,
@@ -48,7 +53,6 @@ class Architect {
 		7 => 145,
 		8 => 146,
 	];
-	public int $MAINPATHMAX = 225;
 	public array $SIDEPATHCHANCES = [
 		1 => 50,
 		2 => 65,
@@ -57,11 +61,20 @@ class Architect {
 		5 => 75,
 		6 => 76,
 	];
-	public int $SIDEPATHMAX = 106;
 
 	public function __construct(EntityManagerInterface $em, TranslatorInterface $trans) {
 		$this->em = $em;
 		$this->trans = $trans;
+		$sidePathMax = 0;
+		foreach ($this->SIDEPATHCHANCES as $value) {
+			$sidePathMax += $value;
+		}
+		$this->SIDEPATHMAX = $sidePathMax;
+		$mainPathMax = 0;
+		foreach ($this->MAINPATHCHANCES as $value) {
+			$mainPathMax += $value;
+		}
+		$this->MAINPATHMAX = $mainPathMax;
 	}
 
 	public function buildFloor(Dungeon $dungeon, int $aDepth, int $rDepth): Floor {
@@ -95,9 +108,11 @@ class Architect {
 		}
 		# Build the main path.
 		while ($range <= $floorSprawl) {
+			echo "Building main path...\n";
 			$room = new Room;
 			$this->em->persist($room);
 			$room->setFloor($floor);
+			$room->setDungeon($dungeon);
 			$room->setVisits(0);
 			if ($range === 1 && $teleporter) {
 				$type = $this->findRoomTypeNamed('teleporter');
@@ -114,10 +129,11 @@ class Architect {
 				# This only hits on the very first room.
 				$room->setPathRoll(0);
 				if ($aDepth === 1) {
+					echo "Creating dungeon exit...\n";
 					# Sets the very first room of the first floor as the dungeon exit.
 					$room->setDungeonExit(true);
 				} else {
-					echo "looking for higher floor\n";
+					echo "Looking for higher floor...\n";
 					# We need to find the floor above us for this stair to connect to.
 					$room->setEntersToFloor($floor);
 					$farthest = null;
@@ -226,6 +242,7 @@ class Architect {
 				$room = new Room;
 				$this->em->persist($room);
 				$room->setFloor($floor);
+				$room->setDungeon($dungeon);
 				$room->setVisits(0);
 				$room->setRange($range);
 				$room->setDungeonExit(false); # Default value.
@@ -256,7 +273,7 @@ class Architect {
 			}
 		}
 		$bypassRoll = rand(1,100);
-		if ($bypassRoll <= $this->BYPASSCHANCE) {
+		if ($bypassRoll <= pow($aDepth, $this->BYPASSPOWER)) {
 			$above = $this->em->createQuery(
 				"SELECT f FROM App:Floor f WHERE finalized=false AND f.actualDepth < :myDepth ORDER BY f.actualDepth ASC"
 			)->setParameters(
@@ -269,6 +286,7 @@ class Architect {
 							$room = new Room;
 							$this->em->persist($room);
 							$room->setFloor($floor);
+							$room->setDungeon($dungeon);
 							$room->setDungeonExit(false);
 							$room->setType($this->findRoomTypeNamed('stairs'));
 							$room->setPathRoll(0);
@@ -282,7 +300,8 @@ class Architect {
 			}
 		}
 		$this->em->flush();
-		echo "Floor completed!\n";
+		$total = $floor->getRooms()->count();
+		echo "Floor completed! $total Rooms!\n";
 		return $floor;
 	}
 

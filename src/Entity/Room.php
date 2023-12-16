@@ -24,14 +24,14 @@ class Room {
 	private ?Floor $entersToFloor = null;
 	private Collection $monsters;
 	private array $DIRECTIONS = [
-   		1 => "N",
-   		2 => "NE",
-   		3 => "E",
-   		4 => "SE",
-   		5 => "S",
-   		6 => "SW",
-   		7 => "W",
-   		8 => "NW",
+   		0 => "N",
+   		1 => "NE",
+   		2 => "E",
+   		3 => "SE",
+   		4 => "S",
+   		5 => "SW",
+   		6 => "W",
+   		7 => "NW",
    	];
 
 	public function __construct() {
@@ -42,44 +42,31 @@ class Room {
    	}
 
 	public function findAvailableDirection(): string|false {
-   		$all = $this->DIRECTIONS;
-   		foreach ($this->exits as $exit) {
-   			$dir = $exit->getDirection();
-   			foreach ($all as $key => $opt) {
-   				# Check if this transit's direction exists in the array above, remove it if it does.
-   				if (in_array($dir, $all)) {
-   					unset($all[$key]);
-   					break; # Return to outer loop.
-   				}
-   			}
-   		}
-   		$available = array_values($this->findAllAvailableDirections());
-   		$max = count($available);
-   		if ($max >= 1) {
-   			# More than one left, return one at random.
-   			return $available[rand(0, $max-1)];
-   		} elseif ($max === 1) {
-   			# Only one left, just return it.
-   			return $available[array_key_last($available)];
-   		}
-   		# Shouldn't happen, but just in case.
-   		return false;
-   	}
-
-	public function findAllAvailableDirections(): array {
-   		$all = $this->DIRECTIONS;
-   		foreach ($this->exits as $exit) {
-   			$dir = $exit->getDirection();
-   			foreach ($all as $key => $opt) {
-   				# Check if this transit's direction exists in the array above, remove it if it does.
-   				if (in_array($dir, $all)) {
-   					unset($all[$key]);
-   					break; # Return to outer loop.
-   				}
-   			}
-   		}
-   		return $all;
-   	}
+		$i = rand(0,7);
+		$total = 1;
+		# Begin Loop.
+		while (true) {
+			$checking = $this->DIRECTIONS[$i];
+			foreach ($this->exits as $exit) {
+				if ($exit->getDirection() === $checking) {
+					break;
+				} else {
+					return $checking;
+				}
+			}
+			# Switch $i to next key to check.
+			if ($i === 7) {
+				$i = 0;
+			} else {
+				$i++;
+			}
+			$total++;
+			# Check if there are no more directions and fail out.
+			if ($total > count($this->DIRECTIONS)) {
+				return false;
+			}
+		}
+	}
 
 	public function findFromDirection(Room $oldRoom, bool $full = false) {
 		foreach ($this->exits as $exit) {

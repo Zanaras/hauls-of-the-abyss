@@ -45,7 +45,7 @@ class GateKeeper {
 	 *
 	 * @return GuideKeeper|Character
 	 */
-	public function gateway(string $route, array $slugs = [], array $opts = ['list'=>true], bool $flush = true): GuideKeeper|Character {
+	public function gateway(string $route, array $slugs = [], array $opts = ['list'=>true], bool $flush = true): GuideKeeper|Character|array {
 		$user = $this->app->security($route, $slugs, false, $flush);
 		if ($user instanceof GuideKeeper) {
 			return $user;
