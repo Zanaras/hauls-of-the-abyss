@@ -61,7 +61,10 @@ class DungeonController extends AbstractController {
 		}
 		$start = $this->em->getRepository(Room::class)->findOneBy(['dungeonExit'=>true]);
 		$char->setRoom($start);
+		$char->setDungeon($start->getDungeon());
 		$start->setVisits($start->getVisits()+1);
+		$floor = $start->getFloor();
+		$floor->setVisits($floor->getVisits()+1);
 		$this->em->flush();
 		return $this->redirectToRoute('dungeon_status');
 	}
@@ -74,6 +77,7 @@ class DungeonController extends AbstractController {
 			return $this->redirectToRoute($char->getRoute());
 		}
 		$char->setRoom(null);
+		$char->setDungeon(null);
 		$this->em->flush();
 		return $this->redirectToRoute('dungeon_status');
 	}

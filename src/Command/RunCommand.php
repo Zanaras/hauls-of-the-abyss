@@ -39,13 +39,16 @@ class RunCommand extends Command {
 		$output->writeln("Hauls of the Abyss -- Running!");
 		$dungeons = $this->em->getRepository(Dungeon::class)->findAll();
 		$dungeonCount = 0;
-		foreach ($dungeons as $dungeon) {
+		foreach ($dungeons as $each) {
+			$name = $each->getName();
+			$output->writeln("Checking $name...");
 			$dungeonCount++;
-			$this->dm->checkDungeon($dungeon);
+			$this->dm->checkDungeon($each);
 		}
 
 		# This is basically a game initialization check.
 		if ($dungeonCount === 0) {
+			$output->writeln("Creating The Abyss...");
 			$dungeon = new Dungeon();
 			$this->em->persist($dungeon);
 			$dungeon->setName("The Abyss");
