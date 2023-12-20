@@ -82,18 +82,20 @@ class DungeonController extends AbstractController {
 		return $this->redirectToRoute('dungeon_status');
 	}
 
-	#[Route('/move/{transit}', name: 'dungeon_move', requirements: ['trasnit'=>'\d+'])]
-	public function move(Transit $transit): Response {
-		$char = $this->gk->gateway('dungeon_move', ['transit'=>$transit->getId()], ['transit'=>$transit]);
+	#[Route('/move/{dir}', name: 'dungeon_move', requirements:['dir'=>'(NW|N|NE|E|SE|S|SW|W|D|U){1,2}'])]
+	public function move(string $dir): Response {
+		[$char, $transit] = $this->gk->gateway('dungeon_move', ['dir'=>$dir], ['dir'=>$dir]);
 		if ($char instanceof GuideKeeper) {
 			$this->addFlash('error', $this->trans->trans($char->getReason(), [], 'gatekeeper'));
 			return $this->redirectToRoute($char->getRoute());
 		}
+
 		# If we don't have an error, this is a legitimate move.
 		$oldRoom = $char->getRoom();
 		$this->dm->moveCharacter($char, $transit);
 		$fromDir = $transit->getToRoom()->findFromDirection($oldRoom, true);
 		$this->addFlash('notice', "You enter the room from the $fromDir.");
+
 		return $this->redirectToRoute('dungeon_status');
 	}
 

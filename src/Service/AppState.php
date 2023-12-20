@@ -32,7 +32,7 @@ class AppState {
 	const DUNGEON = 2;
 	const WILDS = 3;
 
-	const SETTINGTYPES = ['string', 'bool', 'int', 'float'];
+	private static array $SETTINGTYPES = ['string', 'bool', 'int', 'float'];
 
 	private EntityManagerInterface $em;
 	private Security $security;
@@ -71,7 +71,7 @@ class AppState {
 	 * @return AppSetting		Object version of the setting you just set.
 	 */
 	public function setGlobal(string $name, string|int|float|bool $value, string $type = 'string'): AppSetting {
-		if (in_array($type, $this::SETTINGTYPES)) {
+		if (in_array($type, self::$SETTINGTYPES)) {
 			$setting = $this->em->getRepository(AppSetting::class)->findOneBy(['name'=>$name]);
 			if (!$setting) {
 				$setting = new AppSetting();
@@ -98,7 +98,7 @@ class AppState {
 	 * @return float|bool|int|string
 	 */
 	public function fetchGlobal(string $name, string|int|float|bool $default, string $type = 'string'): float|bool|int|string {
-		if (in_array($type, $this::SETTINGTYPES)) {
+		if (in_array($type, self::$SETTINGTYPES)) {
 			$setting = $this->em->getRepository(AppSetting::class)->findOneBy(['name'=>$name]);
 			if (!$setting) {
 				$setting = new AppSetting;

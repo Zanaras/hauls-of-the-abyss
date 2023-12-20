@@ -237,10 +237,10 @@ class GateKeeper {
 	}
 
 	private function dungeon_move_test(Character $char, string $route = 'dungeon_move', array $opts = []): array {
-		if (array_key_exists('dir', $opts)) {
-			$title = 'Move '.self::DIRECTIONS[$opts['dir']];
+		if (!array_key_exists('dir', $opts)) {
+			return $this->fail('Move to a Room', 'dungeon.nodirectiongiven');
 		} else {
-			$title = 'Move to a Room';
+			$title = 'Move '.self::DIRECTIONS[$opts['dir']];
 		}
 		if ($char->getAreaCode() === self::MU) {
 			return $this->fail($title, 'generic.notstarted');
@@ -252,18 +252,19 @@ class GateKeeper {
 		if (!$room) {
 			return $this->fail($title, 'dungeon.notexploring');
 		}
-		if (!array_key_exists('transit', $opts)) {
-			return $this->fail($title, 'dungeon.notransitgiven');
+		foreach ($room->getExits() as $exit) {
+			if ($exit->getDirection() === $opts['dir']) {
+				$return = $this->pass($title, $route, [
+					'dir'=>$opts['dir']
+				]);
+				$return['list'] = [$char, $exit];
+				return $return;
+			}
 		}
-		if (!$room->getExits()->contains($opts['transit'])) {
-			return $this->fail($title, 'dungeon.notvalidtransit');
-		}
-		return $this->pass($title, $route, [
-			'transit'=>$opts['transit']->getId()
-		]);
+		return $this->fail($title, 'dungeon.notvalidtransit');
 	}
 
-	private function dungeon_retreat_test(Character $char, string $route = 'dungeon_status', $opts = ['list'=>false]): array {
+	private function dungeon_retreat_test(Character $char, string $route = 'dungeon_status'): array {
 		$title = 'Retreat from the Room';
 		if ($char->getAreaCode() === self::MU) {
 			return $this->fail($title, 'generic.notstarted');
@@ -281,7 +282,7 @@ class GateKeeper {
 		}
 		foreach ($room->getExits() as $each) {
 			if ($each->getToRoom() === $last) {
-				$return = $this->pass($title, 'dungeon_retreat');
+				$return = $this->pass($title, $route);
 				$return['list'] = [$char, $each];
 				return $return;
 			}
@@ -296,7 +297,7 @@ class GateKeeper {
 	 *
 	 * @return array
 	 */
-	private function town_status_test(Character $char, string $route = 'town_status', $opts=[]): array {
+	private function town_status_test(Character $char, string $route = 'town_status'): array {
 		$title = 'Character Status';
 		if ($char->getAreaCode() === self::MU) {
 			return $this->fail($title, 'generic.notstarted');
